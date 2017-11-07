@@ -1,0 +1,14 @@
+# dev (vagrant):
+# ------------------
+[default]
+jscholarship.test
+
+[app]
+jscholarship.test
+
+[db]
+jscholarship-db.test
+
+[dev:children]
+app
+db
