@@ -13,3 +13,6 @@
 
 - src: https://github.com/dheles/java-ansible-role
   name: java
+
+- src: https://github.com/dheles/maven-ansible-role
+  name: maven

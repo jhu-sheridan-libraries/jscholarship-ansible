@@ -3,3 +3,4 @@
 
   roles:
   - { role: java, jdk: true,  tags: ['java'],   become: true }
+  - { role: maven,            tags: ['maven'] }
