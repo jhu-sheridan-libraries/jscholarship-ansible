@@ -16,3 +16,6 @@
 
 - src: https://github.com/dheles/maven-ansible-role
   name: maven
+
+- src: https://github.com/dheles/ant-ansible-role
+  name: ant
