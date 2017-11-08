@@ -10,3 +10,6 @@
 
 - src: https://github.com/dheles/testup-ansible-role
   name: testup
+
+- src: https://github.com/dheles/java-ansible-role
+  name: java

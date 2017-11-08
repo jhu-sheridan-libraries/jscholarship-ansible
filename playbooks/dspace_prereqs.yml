@@ -1,0 +1,5 @@
+- name: install dspace prereqs
+  hosts: app
+
+  roles:
+  - { role: java, jdk: true,  tags: ['java'],   become: true }

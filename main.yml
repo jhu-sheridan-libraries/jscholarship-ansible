@@ -1,2 +1,3 @@
 ---
-# include project playbooks here
+- include: playbooks/dspace_prereqs.yml
+  tags: ['prereqs']
