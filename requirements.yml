@@ -19,3 +19,6 @@
 
 - src: https://github.com/dheles/ant-ansible-role
   name: ant
+
+- src: https://github.com/dheles/tomcat-ansible-role
+  name: tomcat
