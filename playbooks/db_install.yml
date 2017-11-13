@@ -1,0 +1,5 @@
+- name: install database for dspace
+  hosts: db
+
+  roles:
+  - { role: postgres, tags: ['postgres'], become: true }

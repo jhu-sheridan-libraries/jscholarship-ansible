@@ -1,3 +1,5 @@
 ---
-- include: playbooks/dspace_prereqs.yml
-  tags: ['prereqs']
+- include:  playbooks/dspace_prereqs.yml
+  tags:     ['prereqs']
+- include:  playbooks/db_install.yml
+  tags:     ['db']
