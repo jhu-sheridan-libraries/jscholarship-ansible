@@ -16,6 +16,7 @@ Vagrant.configure(2) do |config|
     config.vm.box = "debian/stretch64"
     config.vm.box_version = "9.2.0"
   elsif OS=="centos"
+    # https://app.vagrantup.com/centos/boxes/7
     config.vm.box = "centos/7"
     config.vm.box_version = "1710.01" # 7.4.1708
   else
