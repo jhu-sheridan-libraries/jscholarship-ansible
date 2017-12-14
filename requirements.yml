@@ -23,5 +23,5 @@
 - src: https://github.com/dheles/tomcat-ansible-role
   name: tomcat
 
-- src: https://github.com/dheles/ansible-role-postgres
+- src: https://github.com/dheles/postgres-ansible-role
   name: postgres
