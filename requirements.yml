@@ -25,3 +25,7 @@
 
 - src: https://github.com/dheles/postgres-ansible-role
   name: postgres
+
+- src: https://github.com/dheles/dspace-5-ansible-role.git
+  name: dspace-5
+
