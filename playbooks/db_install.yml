@@ -3,3 +3,14 @@
 
   roles:
   - { role: postgres, tags: ['postgres'], become: true }
+
+  # TODO: refactor
+  tasks:
+  - name: add pg_hba entry for dspace database
+    include: tasks/pg_hba_entry.yml
+    vars:
+      connection_type: "local"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      auth_method: "md5"
+      state: "present"
