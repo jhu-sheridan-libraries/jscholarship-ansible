@@ -13,7 +13,24 @@ set_up_tests:   true
 app_user:       "dspace"
 
 # db vars
-db_password:    "{{ vault_db_password }}"
-# TODO: refactor
-postgres_user:  "postgres"
-pgdata: "/var/lib/pgsql/data/"
+db_password:            "{{ vault_db_password }}"
+db_name:                "dspace"
+db_user:                "dspace"
+db_create_users:        true
+db_users:
+  - user:               "{{ db_user }}"
+    pass:               "{{ db_password }}"
+    flags:              "NOSUPERUSER"
+
+db_create_databases:    true
+db_databases:
+  - name:               "{{ db_name }}"
+    encoding:           "UTF-8"
+    owner:              "{{ db_user }}"
+
+postgres_hba_entries:
+- type:                 "host"
+  database:             "{{ db_name }}"
+  user:                 "{{ db_user }}"
+  address:              "{{ dspace_address }}"
+  method:               "md5"

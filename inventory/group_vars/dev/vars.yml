@@ -4,22 +4,4 @@ debugging:              true
 login_user_passphrase:  "{{ vault_login_user_passphrase }}"
 
 # db vars
-db_name:                "dspace"
-db_user:                "dspace"
-db_create_users:        true
-db_users:
-  - user:               "{{ db_user }}"
-    pass:               "{{ db_password }}"
-    flags:              "NOSUPERUSER"
 
-db_create_databases:    true
-db_databases:
-  - name:               "{{ db_name }}"
-    encoding:           "UTF-8"
-    owner:              "{{ db_user }}"
-# postgres_hba_entries:
-#   - type:                   "host"
-#     database:               "dspace"
-#     user:                   "dspace"
-#     address:                "127.0.0.1 255.255.255.255"
-#     method:                 "md5"
