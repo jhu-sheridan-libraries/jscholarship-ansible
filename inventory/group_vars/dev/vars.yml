@@ -4,4 +4,10 @@ debugging:              true
 login_user_passphrase:  "{{ vault_login_user_passphrase }}"
 
 # db vars
+dspace_ip:                  "{{ hostvars[groups['app'][0]]['ansible_all_ipv4_addresses'][0] }}"
+dspace_db_ip:               "{{ hostvars[groups['db'][0]]['ansible_all_ipv4_addresses'][0] }}"
+# dspace_db_ip:   "{{ hostvars[groups['db'][0]]['ansible_eth1']['ipv4']['address'] }}"
 
+dspace_address:             "{{ dspace_ip }}"
+dspace_db_address:          "{{ dspace_db_ip }}"
+postgres_listen_addresses:  "localhost,{{ dspace_db_address }}"
