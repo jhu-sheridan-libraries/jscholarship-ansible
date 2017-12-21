@@ -1,3 +1,7 @@
+- name: get facts from app server (e.g. ip), for the db server's config
+  hosts: app
+  gather_facts: true
+
 - name: install database for dspace
   hosts: db
 
