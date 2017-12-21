@@ -1,0 +1,22 @@
+---
+- hosts: all
+  connection: local
+
+  vars:
+    addresses:
+      - "10.8.21.101"
+      - "10.8.21.102/32"
+      - "localhost"
+      - ""
+
+  tasks:
+    # NOTE: ipsubnet filter works iff you have python-netaddr installed on your ansible host
+    # - name: test subnet
+    #   debug:
+    #     msg: "{{ item | ipsubnet | default(item, true) }}"
+    #   with_items: "{{ addresses }}"
+    # '\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'
+    - name: add missing subnet
+      debug:
+        msg: "{{ item | regex_replace('^(?P<ip>(?:[0-9]{1,3}\\.){3}[0-9]{1,3})$', '\\g<ip>/32') }}"
+      with_items: "{{ addresses }}"
