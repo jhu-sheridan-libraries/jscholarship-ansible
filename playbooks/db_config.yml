@@ -1,0 +1,27 @@
+- name: adjust database config for dspace
+  hosts: db
+  become: true
+
+  tasks:
+  - name: remove local pg_hba entry for dspace database
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "local"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      method: "md5"
+      state: "absent"
+
+  - name: add ip-based pg_hba entry for dspace database
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "host"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      address:  "{{ dspace_db_ip }}"
+      method: "md5"
+      state: "present"
