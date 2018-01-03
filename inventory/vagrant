@@ -7,7 +7,7 @@ jscholarship.test
 jscholarship.test
 
 [db]
-jscholarship.test
+jscholarship-db.test
 
 [dev:children]
 app
