@@ -6,3 +6,4 @@
   - { role: maven,            tags: ['maven'] }
   - { role: ant,              tags: ['ant'] }
   - { role: tomcat,           tags: ['tomcat'] }
+  - { role: apache,           tags: ['apache'] }

@@ -12,6 +12,13 @@ set_up_tests:   true
 # application user vars - dspace user and tomcat user
 app_user:       "dspace"
 
+# apache vars
+dspace_name:            "JScholarship"
+hostname:               "{{ dspace_name | lower }}"
+domainname:             "library.jhu.edu"
+apache_https:           true
+apache_proxy_tomcat:    true
+
 # db vars
 db_password:            "{{ vault_db_password }}"
 db_name:                "dspace"
