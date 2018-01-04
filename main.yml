@@ -4,4 +4,6 @@
 - include:  playbooks/db_install.yml
   tags:     ['db']
 - include:  playbooks/dspace_install.yml
-  tags:     ['dspace']
+  tags:     ['dspace','install']
+- include:  playbooks/dspace_post_install.yml
+  tags:     ['dspace','post']

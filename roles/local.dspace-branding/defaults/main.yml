@@ -1,0 +1,10 @@
+---
+branding_app_user:        "{{ app_user | default('dspace') }}"
+branding_dspace_install:  "{{ dspace_install | default('/opt/dspace') }}"
+branding_dspace_name:     "{{ dspace_name | default('DSpace') }}"
+branding_theme_path:      "{{ theme_path | default('Mirage2') }}"
+branding_full_theme_path: "{{ branding_dspace_install }}/webapps/xmlui/themes/{{ branding_theme_path }}"
+branding_logo:            "DSpace-logo-line.svg"
+branding_primary_color:   "607890"
+branding_header_color:    "AAB8C6"
+branding_header2_color:   "1F3F5E"

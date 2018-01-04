@@ -1,0 +1,34 @@
+---
+    - name: brand bootstrap variables
+      template:
+        src: templates/bootstrap_variables.scss.j2
+        dest: "{{ branding_full_theme_path }}/styles/classic_mirage_color_scheme/_bootstrap_variables.scss"
+      notify: update styles
+      become: true
+      become_user: "{{ branding_app_user }}"
+
+    - name: brand additional styles
+      template:
+        src: templates/style.scss.j2
+        dest: "{{ branding_full_theme_path }}/styles/_style.scss"
+      notify: update styles
+      become: true
+      become_user: "{{ branding_app_user }}"
+
+    - name: brand logo
+      copy:
+        src: "files/{{ branding_logo }}"
+        dest: "{{ branding_full_theme_path }}/images/DSpace-logo-line.svg"
+      notify: update styles
+      become: true
+      become_user: "{{ branding_app_user }}"
+
+    - name: brand DSpace with our repository name
+      replace:
+        path: "{{ item }}"
+        regexp: '(\s*)DSpace(?!\s+created\s+by)(?!\s+[Oo]bject)(?!\s+Version)(\s+Repository)*(\s*.*)?$'
+        replace: '\1{{ dspace_name }}\3'
+        backup: yes
+      with_items:
+        - "{{ branding_dspace_install }}/config/news-xmlui.xml"
+        - "{{ branding_dspace_install }}/webapps/xmlui/i18n/messages.xml"
