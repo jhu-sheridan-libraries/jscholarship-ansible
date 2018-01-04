@@ -1,0 +1,14 @@
+---
+- name: apply branding to dspace
+  hosts: app
+  become: true
+  become_user: "{{ app_user }}"
+
+  tasks:
+  - include_role:
+      name: local.dspace-branding
+    vars:
+      branding_logo:            "{{ logo }}"
+      branding_primary_color:   "{{ medium_blue }}"
+      branding_header_color:    "{{ logo_blue }}"
+      branding_header2_color:   "{{ blue_grey }}"

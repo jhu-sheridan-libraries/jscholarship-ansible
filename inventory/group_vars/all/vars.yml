@@ -41,3 +41,10 @@ postgres_hba_entries:
   user:                 "{{ db_user }}"
   address:              "{{ dspace_address }}"
   method:               "md5"
+
+# vars for branding
+# -----------------
+logo_blue:    "002D72" #	PMS 288C
+medium_blue:  "005EB8" # PMS 300C
+blue_grey:    "A7BCD6" #	PMS 651C
+logo:         "sheridan-libraries.logo.small.horizontal.white.svg"
