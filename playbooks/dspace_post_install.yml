@@ -1,2 +1,3 @@
 ---
 - include: dspace_branding.yml
+- include: mount_assetstores.yml
