@@ -1,0 +1,94 @@
+---
+# NOTE: this entails a lot of reaching into the dspace role's internals
+# TODO: consider abstractions that might support the role's encapsulation
+- name: post-install configuration
+  hosts: app
+  become: true
+  # NOTE: it appears that since app_user can't restart tomcat,
+  # the whole play needs to be run as root
+  # become_user: "{{ app_user }}"
+
+  tasks:
+  - name: include dspace role to get its handlers
+    include_role:
+      name: dspace-5
+      tasks_from: dolittle
+
+  - name: request item configuration
+    lineinfile:
+      dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+      regexp: "^request.item.helpdesk.override"
+      line: "request.item.helpdesk.override = {{ helpdesk_override }}"
+    notify: update configs
+
+  - name: use proxies
+    lineinfile:
+      dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+      regexp: "^useProxies"
+      line: "useProxies = {{ use_proxies }}"
+    notify: update configs
+
+  - name: configure authentication methods
+    template:
+      src: templates/authentication.cfg.j2
+      dest: "{{ dspace_source }}/dspace/config/modules/authentication.cfg"
+    notify: update configs
+
+  - name: configure shibboleth authentication
+    template:
+      src: templates/authentication-shibboleth.cfg.j2
+      dest: "{{ dspace_source }}/dspace/config/modules/authentication-shibboleth.cfg"
+    notify: update configs
+
+  # configure assetstores
+  - block:
+    - name: configure assetstore 0
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        regexp: "^assetstore.dir\\s*="
+        line: "assetstore.dir = /mnt/dspace/storage/assetstore"
+      notify: update configs
+
+    - name: configure assetstore 1
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        regexp: "^assetstore.dir.1"
+        insertafter: "^assetstore.dir\\s*="
+        line: "assetstore.dir.1 = /mnt/dspace/storage/assetstore1"
+      notify: update configs
+
+  # embargo settings
+  - block:
+    - name: configure embargo terms
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        regexp: "^embargo.field.terms"
+        line: "embargo.field.terms = local.embargo.terms"
+      notify: update configs
+
+    - name: configure embargo lift
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        regexp: "^embargo.field.lift"
+        line: "embargo.field.lift = local.embargo.lift"
+      notify: update configs
+
+    - name: raise bulk edit limit
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/modules/bulkedit.cfg"
+        regexp: "^gui-item-limit"
+        line: "gui-item-limit = {{ bulk_edit_limit }}"
+      notify: update configs
+  # end block - embargo settings
+
+  - name: configure logging
+    template:
+      src: templates/log4j.properties.j2
+      dest: "{{ dspace_source }}/dspace/config/log4j.properties"
+    notify: update configs
+
+  - name: configure logging - solr
+    template:
+      src: templates/log4j-solr.properties.j2
+      dest: "{{ dspace_source }}/dspace/config/log4j-solr.properties"
+    notify: update configs
