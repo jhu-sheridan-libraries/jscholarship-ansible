@@ -12,6 +12,10 @@ set_up_tests:   true
 # application user vars - dspace user and tomcat user
 app_user:       "dspace"
 
+# install vars
+dspace_install_dir:   "/opt"
+dspace_install:       "{{ dspace_install_dir }}/dspace"
+
 # apache vars
 dspace_name:            "JScholarship"
 hostname:               "{{ dspace_name | lower }}"
@@ -48,3 +52,10 @@ logo_blue:    "002D72" #	PMS 288C
 medium_blue:  "005EB8" # PMS 300C
 blue_grey:    "A7BCD6" #	PMS 651C
 logo:         "sheridan-libraries.logo.small.horizontal.white.svg"
+
+# assetstore vars
+remote_stores_available: false
+stores_fstab:     ""
+assetstores:
+  - assetstore
+  - assetstore1

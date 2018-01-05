@@ -1,0 +1,70 @@
+---
+- name: mount remote assetstores
+  hosts: app
+  become: true
+
+  tasks:
+    - name: simulate remote stores?
+      debug:
+        var: not remote_stores_available
+
+    - name: set vars that follow from the value of remote_stores_available
+      set_fact:
+        local_dirs_presence: "absent"
+      when: remote_stores_available
+    - set_fact:
+        local_dirs_presence: "directory"
+      when: not remote_stores_available
+
+    - name: create or remove local assetstore directories
+      file:
+        dest: "{{ dspace_install }}/assetstore/{{ item }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        state: "{{ local_dirs_presence }}"
+      with_items: "{{ assetstores }}"
+
+    - name: create the directory to contain the mount or symlink
+      file:
+        dest: "/mnt/dspace"
+        state: directory
+
+    # NOTE: when switching from one mode to another, we need to first undo the existing one
+    # a block for each condition is the easiest way to control the order in which this will happen
+    - block:
+      # NOTE: this will delete any items currently in your local assetstore
+      - name: destroy symlinks to local assetstore
+        file:
+          dest: /mnt/dspace/storage
+          src: "{{ dspace_install }}/assetstore"
+          state: absent
+          force: yes
+
+      # e.g. sam.mse.jhu.edu:/apps/dspace    /mnt/dspace/storage             nfs     rw,tcp,intr,noatime     0 0
+      - name: mount remote stores
+        mount:
+          name: /mnt/dspace/storage
+          src: "{{ stores_fstab }}"
+          fstype: nfs
+          opts: rw,tcp,intr,noatime
+          state: mounted
+      when: remote_stores_available and stores_fstab != ""
+
+    - block:
+      - name: unmount remote stores
+        mount:
+          name: /mnt/dspace/storage
+          src: "{{ stores_fstab }}"
+          fstype: nfs
+          opts: rw,tcp,intr,noatime
+          state: absent
+
+      - name: create symlinks to local assetstores
+        file:
+          dest: /mnt/dspace/storage
+          src: "{{ dspace_install }}/assetstore"
+          owner: "{{ app_user }}"
+          group: "{{ app_user }}"
+          state: link
+          force: yes
+      when: not remote_stores_available
