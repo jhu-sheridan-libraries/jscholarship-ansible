@@ -5,6 +5,7 @@
 project:        "jscholarship"
 version:        "0.1.0"
 login_user:     "deploy"
+login_group:    "{{ login_user }}"
 
 # testing vars
 set_up_tests:   true
@@ -51,6 +52,19 @@ postgres_hba_entries:
   user:                 "{{ db_user }}"
   address:              "{{ dspace_address }}"
   method:               "md5"
+
+db_backup_file:   "{{ db_name }}_{{ environ }}_backup.sql"
+copy_db_name:     "{{ db_name }}_copy"
+copy_backup_file: "{{ copy_db_name }}_{{ environ }}_backup.sql"
+db_retain_backup:       true
+
+# data transform queries
+db_transform_queries:
+- "anonymize_db.sql.j2"
+
+# admin vars
+# members of this list will not be anonymized (no additional permissions granted):
+admin_users: "{{ vault_admin_users }}"
 
 # vars for branding
 # -----------------

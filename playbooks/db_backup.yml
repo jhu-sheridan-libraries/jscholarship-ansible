@@ -1,145 +1,160 @@
 ---
 - name: create working copy of source database
   hosts: db
-  # become: true
-  # become_user: "{{ login_user }}"
-
-  # handlers:
-  #   - include: handlers/reload_postgres.yml
+  become: true
+  become_user: "{{ login_user }}"
 
   tasks:
-    # TODO: refactor
-    # - name: install ansible postgres prereqs
-    #   include: tasks/ansible_postgres_prereqs.yml
+  - name: install ansible postgres prereqs
+    include_role:
+      name: postgres
+      tasks_from: ansible_prereqs
 
-    - name: add pg_hba entry for source database
-      include_role:
-        name: postgres
-        tasks_from: pg_hba_entry
-      vars:
-        type: "local"
-        database: "{{ db_name }}"
-        user: "{{ db_user }}"
-        method: "md5"
-        state: "present"
+  - name: add pg_hba entry for source database
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "local"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      method: "md5"
+      state: "present"
 
-    - name: add pg_hba entry for database copy
-      include_role:
-        name: postgres
-        tasks_from: pg_hba_entry
-      vars:
-        type: "local"
-        database: "{{ copy_db_name }}"
-        user: "{{ db_user }}"
-        method: "md5"
-        state: "present"
+  - name: add pg_hba entry for database copy
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "local"
+      database: "{{ copy_db_name }}"
+      user: "{{ db_user }}"
+      method: "md5"
+      state: "present"
 
-    - name: add pgpass entry for database copy
-      include: tasks/pgpass.yml
-      vars:
-        admin_user: "{{ login_user }}"
-        admin_group: "{{ login_group }}"
-        database: "{{ copy_db_name }}"
-        user: "{{ db_user }}"
-        password: "{{ db_pass }}"
-        state: "present"
+  - name: add pgpass entry for database copy
+    include_role:
+      name: postgres
+      tasks_from: pgpass
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ copy_db_name }}"
+      user: "{{ db_user }}"
+      password: "{{ db_password }}"
+      state: "present"
 
-    - name: add pgpass entry for source database
-      include: tasks/pgpass.yml
-      vars:
-        admin_user: "{{ login_user }}"
-        admin_group: "{{ login_group }}"
-        database: "{{ db_name }}"
-        user: "{{ db_user }}"
-        password: "{{ db_pass }}"
-        state: "present"
+  - name: add pgpass entry for source database
+    include_role:
+      name: postgres
+      tasks_from: pgpass
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      password: "{{ db_password }}"
+      state: "present"
 
-    - name: backup source database
-      include: tasks/backup_db.yml
-      vars:
-        database: "{{ db_name }}"
-        user: "{{ db_user }}"
-        file: "{{ db_backup_file }}"
+  - name: backup source database
+    include_role:
+      name: postgres
+      tasks_from: backup_db
+    vars:
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      file: "{{ db_backup_file }}"
 
-    - name: restore database copy from source database
-      include: tasks/restore_db.yml
-      vars:
-        database: "{{ copy_db_name }}"
-        user: "{{ db_user }}"
-        file: "{{ db_backup_file }}"
+  - name: restore database copy from source database
+    include_role:
+      name: postgres
+      tasks_from: restore_db
+    vars:
+      database: "{{ copy_db_name }}"
+      user: "{{ db_user }}"
+      file: "{{ db_backup_file }}"
 
-    - name: check transform_queries
-      debug: var=transform_queries
+  - name: check transform_queries
+    debug: var=db_transform_queries
 
-    - name: run queries to transform database
-      include: tasks/query_db.yml
-      vars:
-        admin_user: "{{ login_user }}"
-        admin_group: "{{ login_group }}"
-        database: "{{ copy_db_name }}"
-        user: "{{ db_user }}"
-        query_file: "queries/{{ item }}"
-      with_items: "{{ transform_queries }}"
-      when: transform_queries
+  - name: run queries to transform database
+    include_role:
+      name: postgres
+      tasks_from: query_db
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ copy_db_name }}"
+      user: "{{ db_user }}"
+      query_file: "queries/{{ item }}"
+    with_items: "{{ db_transform_queries }}"
+    when: db_transform_queries
 
-    - name: backup database copy
-      include: tasks/backup_db.yml
-      vars:
-        database: "{{ copy_db_name }}"
-        user: "{{ db_user }}"
-        file: "{{ copy_backup_file }}"
+  - name: backup database copy
+    include_role:
+      name: postgres
+      tasks_from: backup_db
+    vars:
+      database: "{{ copy_db_name }}"
+      user: "{{ db_user }}"
+      file: "{{ copy_backup_file }}"
 
-    - name: drop database copy
-      postgresql_db:
-        name: "{{ copy_db_name }}"
-        state: "absent"
-      become_user: "{{ postgres_user }}"
+  - name: drop database copy
+    include_role:
+      name: postgres
+      tasks_from: drop_db
+    vars:
+      database: "{{ copy_db_name }}"
 
-    - name: remove pg_hba entry for database copy
-      include_role:
-        name: postgres
-        tasks_from: pg_hba_entry
-      vars:
-        type: "local"
-        database: "{{ copy_db_name }}"
-        user: "{{ db_user }}"
-        method: "md5"
-        state: "absent"
+  - name: remove pg_hba entry for database copy
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "local"
+      database: "{{ copy_db_name }}"
+      user: "{{ db_user }}"
+      method: "md5"
+      state: "absent"
 
-    # TODO: review
-    - name: remove pg_hba entry for source database
-      include_role:
-        name: postgres
-        tasks_from: pg_hba_entry
-      vars:
-        type: "local"
-        database: "{{ db_name }}"
-        user: "{{ db_user }}"
-        method: "md5"
-        state: "absent"
+  # TODO: review
+  - name: remove pg_hba entry for source database
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "local"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      method: "md5"
+      state: "absent"
 
-    - name: remove pgpass entry for database copy
-      include: tasks/pgpass.yml
-      vars:
-        admin_user: "{{ login_user }}"
-        admin_group: "{{ login_group }}"
-        database: "{{ copy_db_name }}"
-        user: "{{ db_user }}"
-        password: "{{ db_pass }}"
-        state: "absent"
+  - name: remove pgpass entry for database copy
+    include_role:
+      name: postgres
+      tasks_from: pgpass
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ copy_db_name }}"
+      user: "{{ db_user }}"
+      password: "{{ db_password }}"
+      state: "absent"
 
-    - name: remove pgpass entry for source database
-      include: tasks/pgpass.yml
-      vars:
-        admin_user: "{{ login_user }}"
-        admin_group: "{{ login_group }}"
-        database: "{{ db_name }}"
-        user: "{{ db_user }}"
-        password: "{{ db_pass }}"
-        state: "absent"
+  - name: remove pgpass entry for source database
+    include_role:
+      name: postgres
+      tasks_from: pgpass
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      password: "{{ db_password }}"
+      state: "absent"
 
-    - name: remove the source backup file from the server
-      file:
-        path: "{{ db_backup_file }}"
-        state: absent
-      when: not retain_backup
+  - name: remove the source backup file from the server
+    file:
+      path: "{{ db_backup_file }}"
+      state: absent
+    when: not db_retain_backup
