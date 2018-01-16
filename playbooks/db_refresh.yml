@@ -1,0 +1,4 @@
+---
+# NOTE: only really works with full_environment inventory or emulation thereof
+- include: db_backup.yml
+- include: db_deploy_backup.yml
