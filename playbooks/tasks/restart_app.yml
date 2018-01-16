@@ -1,0 +1,5 @@
+---
+- name: restart dspace
+  include_role:
+    name: tomcat
+    tasks_from: restart

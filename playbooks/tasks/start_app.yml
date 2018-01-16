@@ -1,0 +1,5 @@
+---
+- name: start dspace
+  include_role:
+    name: tomcat
+    tasks_from: start
