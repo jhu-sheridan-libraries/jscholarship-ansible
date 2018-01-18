@@ -1,0 +1,14 @@
+# stage:
+# ------------------
+[default]
+dspace-stage.library.jhu.edu
+
+[app]
+dspace-stage.library.jhu.edu
+
+[db]
+psql02.mse.jhu.edu
+
+[stage:children]
+app
+db

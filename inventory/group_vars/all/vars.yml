@@ -55,7 +55,7 @@ postgres_hba_entries:
 
 db_backup_file:   "{{ db_name }}_{{ environ }}_backup.sql"
 copy_db_name:     "{{ db_name }}_copy"
-copy_backup_file: "{{ copy_db_name }}_{{ environ }}_backup.sql"
+copy_backup_file: "{{ copy_db_name }}_backup.sql"
 db_retain_backup:       true
 
 # data transform queries

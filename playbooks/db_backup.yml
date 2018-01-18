@@ -1,6 +1,6 @@
 ---
 - name: create working copy of source database
-  hosts: db
+  hosts: db_prod
   become: true
   become_user: "{{ login_user }}"
 

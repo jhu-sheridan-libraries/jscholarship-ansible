@@ -1,0 +1,14 @@
+# prod:
+# ------------------
+[default]
+dspace-prod.library.jhu.edu
+
+[app]
+dspace-prod.library.jhu.edu
+
+[db]
+psql03.mse.jhu.edu
+
+[prod:children]
+app
+db
