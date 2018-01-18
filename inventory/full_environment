@@ -35,8 +35,7 @@ db_stage
 dspace-prod.library.jhu.edu
 
 [db_prod]
-#psql03.mse.jhu.edu
-psql02.mse.jhu.edu # TODO: let stage stand in for prod for now
+psql03.mse.jhu.edu
 
 [prod:children]
 app_prod
@@ -47,11 +46,11 @@ db_prod
 [app_servers:children]
 #app_dev
 #app_stage
-app_prod
+#app_prod
 
 [app_not_prod:children]
-app_dev
-#app_stage
+#app_dev
+app_stage
 
 [db_servers:children]
 #db_dev
@@ -59,5 +58,5 @@ app_dev
 #db_prod
 
 [db_not_prod:children]
-db_dev
-#db_stage
+#db_dev
+db_stage
