@@ -40,6 +40,12 @@
       dest: "{{ dspace_source }}/dspace/config/modules/authentication-shibboleth.cfg"
     notify: update configs
 
+  - name: template default license
+    template:
+      src: templates/default.license.j2
+      dest: "{{ dspace_source }}/dspace/config/default.license"
+    notify: update configs
+
   # configure assetstores
   - block:
     - name: configure assetstore 0
