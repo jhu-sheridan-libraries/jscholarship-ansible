@@ -7,3 +7,4 @@
   - { role: ant,              tags: ['ant'] }
   - { role: tomcat,           tags: ['tomcat'] }
   - { role: apache,           tags: ['apache'] }
+  - { role: imagemagick,      tags: ['imagemagick'],  become: true }
