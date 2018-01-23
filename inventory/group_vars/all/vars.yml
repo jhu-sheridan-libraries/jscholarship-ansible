@@ -81,8 +81,7 @@ assetstores:
   - assetstore1
 
 # config vars
-# TODO: set http://jhir.library.jhu.edu/handle/ for prod?
-# dspace_handle_canonical_prefix: "{{ dspace_fqdn }}/handle/"
+dspace_handle_canonical_prefix: "http://jhir.library.jhu.edu/handle/"
 dspace_handle_prefix:     1774.2
 helpdesk_override:        true
 # TODO: set true for prod
