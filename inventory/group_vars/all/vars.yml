@@ -88,6 +88,9 @@ helpdesk_override:        true
 # TODO: set true for prod
 use_proxies:              false
 bulk_edit_limit:          500
+thumbnail_maxwidth:       200
+thumbnail_maxheight:      200
+thumbnail_imagemagick:    true
 
 # logging vars
 # TODO: incorporate logrotate

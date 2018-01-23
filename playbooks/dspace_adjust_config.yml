@@ -98,3 +98,36 @@
       src: templates/log4j-solr.properties.j2
       dest: "{{ dspace_source }}/dspace/config/log4j-solr.properties"
     notify: update configs
+
+  # thumbnail settings
+  - block:
+    - name: configure thumbnail width
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        regexp: "^thumbnail.maxwidth"
+        line: "thumbnail.maxwidth = {{ thumbnail_maxwidth }}"
+      notify: update configs
+
+    - name: configure thumbnail height
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        regexp: "^thumbnail.maxheight"
+        line: "thumbnail.maxheight = {{ thumbnail_maxheight }}"
+      notify: update configs
+  # end block - thumbnail settings
+
+  # imagemagick
+  # NOTE: this is fragile and will stop working as of v6
+  - block:
+    - name: switch from default thumbnail generation to imagemagick
+      lineinfile:
+        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        regexp: '(^\s+)(Word Text Extractor)(, JPEG Thumbnail)'
+        line: |
+          \1\2, \
+          \1ImageMagick Image Thumbnail, \
+          \1ImageMagick PDF Thumbnail
+        backrefs: true
+      notify: update configs
+    when: thumbnail_imagemagick
+    # end block - imagemagick
