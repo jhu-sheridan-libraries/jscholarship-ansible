@@ -1,0 +1,98 @@
+---
+- name: run one or more queries against a database
+  hosts: db
+  become: true
+  become_user: "{{ login_user }}"
+
+  vars:
+    db_queries: []
+
+  tasks:
+  - name: check passed-in var
+    debug:
+      msg: "db_query = {{ item }}"
+    with_items: "{{ db_queries }}"
+
+  - name: make sure we have all required vars
+    fail:
+      msg: "db_queries value must be passed in"
+    when: db_queries == []
+
+  - name: install ansible postgres prereqs
+    include_role:
+      name: postgres
+      tasks_from: ansible_prereqs
+
+  - name: add pg_hba entry for database
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "local"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      method: "md5"
+      state: "present"
+
+  - name: add pgpass entry for database
+    include_role:
+      name: postgres
+      tasks_from: pgpass
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      password: "{{ db_password }}"
+      state: "present"
+
+  - name: backup database
+    include_role:
+      name: postgres
+      tasks_from: backup_db
+    vars:
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      file: "{{ db_backup_file }}"
+
+  - name: run queries against database
+    include_role:
+      name: postgres
+      tasks_from: query_db
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      query_file: "queries/{{ item }}"
+    with_items: "{{ db_queries }}"
+    when: db_queries
+
+  - name: remove pg_hba entry for database
+    include_role:
+      name: postgres
+      tasks_from: pg_hba_entry
+    vars:
+      type: "local"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      method: "md5"
+      state: "absent"
+
+  - name: remove pgpass entry for database
+    include_role:
+      name: postgres
+      tasks_from: pgpass
+    vars:
+      admin_user: "{{ login_user }}"
+      admin_group: "{{ login_group }}"
+      database: "{{ db_name }}"
+      user: "{{ db_user }}"
+      password: "{{ db_password }}"
+      state: "absent"
+
+  - name: remove the source backup file from the server
+    file:
+      path: "{{ db_backup_file }}"
+      state: absent
+    when: not db_retain_backup
