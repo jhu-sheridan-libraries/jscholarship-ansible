@@ -23,6 +23,8 @@
         group: "{{ app_user }}"
         state: "{{ local_dirs_presence }}"
       with_items: "{{ assetstores }}"
+      become: True
+      become_user: "{{ app_user }}"
 
     - name: create the directory to contain the mount or symlink
       file:
