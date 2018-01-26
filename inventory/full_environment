@@ -20,7 +20,7 @@ db_dev
 # stage:
 # ------------------
 [app_stage]
-dspace-stage.library.jhu.edu
+dspace-stage.mse.jhu.edu
 
 [db_stage]
 psql02.mse.jhu.edu

@@ -1,10 +1,10 @@
 # stage:
 # ------------------
 [default]
-dspace-stage.library.jhu.edu
+dspace-stage.mse.jhu.edu
 
 [app]
-dspace-stage.library.jhu.edu
+dspace-stage.mse.jhu.edu
 
 [db]
 psql02.mse.jhu.edu
