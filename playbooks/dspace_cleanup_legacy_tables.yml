@@ -1,0 +1,15 @@
+---
+- name: clean up legacy communities2item browse table
+  include: db_query.yml
+  vars:
+    db_queries:
+      - cleanup_communities2item.sql
+
+- name: clean up legacy browse tables
+  hosts: app
+
+  tasks:
+  - name: run the command to clean up legacy browse tables
+    shell: "{{ dspace_install }}/bin/dspace index-db-browse -f -d"
+    become: true
+    become_user: "{{ app_user }}"
