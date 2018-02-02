@@ -1,0 +1,12 @@
+---
+- name: deploy and configure curation tasks
+  hosts: app
+
+  tasks:
+  - name: name: include tomcat role to get its "restart tomcat" handler
+    include_role:
+      name: tomcat
+      tasks_from: dolittle
+
+  - include_role:
+      name: dspace-curation

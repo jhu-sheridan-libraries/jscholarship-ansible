@@ -99,3 +99,14 @@ loglevel_solr:    "{{ loglevel_default }}"
 loglevel_other:   "{{ loglevel_default }}"
 max_logs: 14
 log_dir: "{{ dspace_install }}/log"
+
+# curation tasks vars
+dspace_curation_repo:       "https://github.com/dheles/ctask.git"
+dspace_curation_branch:     "fixity"
+dspace_curation_module:     "fixity"
+dspace_curation_tasks:
+  - shortname:              "fixity"
+    ui_taskname:            "Check Fixity"
+    classname:              "org.dspace.ctask.fixity.CheckFixity"
+    bundle:                 "fixity-1.0-SNAPSHOT.jar"
+    state:                  "present"

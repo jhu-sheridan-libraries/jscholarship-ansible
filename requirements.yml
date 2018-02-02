@@ -34,3 +34,6 @@
 
 - src: https://github.com/dheles/imagemagick-ansible-role
   name: imagemagick
+
+- src: https://github.com/dheles/dspace-curation-ansible-role.git
+  name: dspace-curation
