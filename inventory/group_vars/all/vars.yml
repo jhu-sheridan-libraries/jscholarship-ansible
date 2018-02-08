@@ -97,16 +97,24 @@ loglevel_default: "WARN"
 loglevel_dspace:  "{{ loglevel_default }}"
 loglevel_solr:    "{{ loglevel_default }}"
 loglevel_other:   "{{ loglevel_default }}"
-max_logs: 14
-log_dir: "{{ dspace_install }}/log"
+max_logs:         14
+log_dir:          "{{ dspace_install }}/log"
 
 # curation tasks vars
+dspace_curation_loglevel: "ERROR"
+# NOTE: set this var to override the log template for *all* curation tasks
+# dspace_curation_log_template: "templates/log4j-curation.properties.j2"
 dspace_curation_repo:       "https://github.com/dheles/ctask.git"
 dspace_curation_branch:     "fixity"
 dspace_curation_module:     "fixity"
 dspace_curation_tasks:
   - shortname:              "fixity"
     ui_taskname:            "Check Fixity"
-    classname:              "org.dspace.ctask.fixity.CheckFixity"
+    package:                "org.dspace.ctask.fixity"
+    classname:              "CheckFixity"
     bundle:                 "fixity-1.0-SNAPSHOT.jar"
     state:                  "present"
+    logging:                true
+    loglevel:               "ERROR"
+    # NOTE: set this var to override the log template for *this* curation task
+    # log_template:           "templates/log4j-curation.properties.j2"
