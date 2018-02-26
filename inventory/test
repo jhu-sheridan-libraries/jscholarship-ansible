@@ -1,0 +1,14 @@
+# test:
+# ------------------
+[default]
+dspace-test.mse.jhu.edu
+
+[app]
+dspace-test.mse.jhu.edu
+
+[db]
+psql02.mse.jhu.edu
+
+[test:children]
+app
+db
