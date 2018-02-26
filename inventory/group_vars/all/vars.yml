@@ -30,6 +30,12 @@ domainname:             "library.jhu.edu"
 apache_https:           true
 apache_proxy_tomcat:    true
 
+# tomcat vars
+catalina_opts:          "-server
+                        -Xms1024m
+                        -Xmx2048m
+                        -XX:+UseParallelGC"
+
 # db vars
 db_password:            "{{ vault_db_password }}"
 db_name:                "dspace"
