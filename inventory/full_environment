@@ -17,6 +17,18 @@ jscholarship-db.test
 app_dev
 db_dev
 
+# test:
+# ------------------
+[app_test]
+dspace-test.mse.jhu.edu
+
+[db_test]
+psql02.mse.jhu.edu
+
+[test:children]
+app_stage
+db_stage
+
 # stage:
 # ------------------
 [app_stage]
@@ -45,18 +57,22 @@ db_prod
 # ------------------
 [app_servers:children]
 #app_dev
+#app_test
 #app_stage
 #app_prod
 
 [app_not_prod:children]
 #app_dev
+#app_test
 app_stage
 
 [db_servers:children]
 #db_dev
+#db_test
 #db_stage
 #db_prod
 
 [db_not_prod:children]
 #db_dev
+#db_test
 db_stage
