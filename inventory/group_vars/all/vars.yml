@@ -59,8 +59,11 @@ postgres_hba_entries:
   address:              "{{ dspace_address }}"
   method:               "md5"
 
+# NOTE: db_source is the name of the production database, and needs its own var,
+# as the test db must have a different db_name, since it shares a server with stage
+db_source:        "dspace"
 db_backup_file:   "{{ db_name }}_{{ environ }}_backup.sql"
-copy_db_name:     "{{ db_name }}_copy"
+copy_db_name:     "{{ db_source }}_copy"
 copy_backup_file: "{{ copy_db_name }}_backup.sql"
 db_retain_backup:       true
 
