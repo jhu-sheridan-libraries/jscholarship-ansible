@@ -4,8 +4,8 @@ debugging:                      true
 login_user_passphrase:          "{{ vault_login_user_passphrase }}"
 
 # assetstore vars
-remote_stores_available:        false
-# stores_fstab:                   "sam.mse.jhu.edu:/apps/dspace_snapshot"
+remote_stores_available:        true
+stores_fstab:                   "sam.mse.jhu.edu:/apps/dspace_snapshot"
 
 # apache vars
 dspace_name:                    "JScholarship-{{ environ | title }}"
