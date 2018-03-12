@@ -34,6 +34,11 @@
     # NOTE: when switching from one mode to another, we need to first undo the existing one
     # a block for each condition is the easiest way to control the order in which this will happen
     - block:
+      - name: check to see if we currently have unneeded symlinks
+        stat:
+          path: /mnt/dspace/storage
+        register: sym 
+
       # NOTE: this will delete any items currently in your local assetstore
       - name: destroy symlinks to local assetstore
         file:
@@ -41,6 +46,7 @@
           src: "{{ dspace_install }}/assetstore"
           state: absent
           force: yes
+        when: sym.stat.islnk is defined and sym.stat.islnk
 
       # e.g. sam.mse.jhu.edu:/apps/dspace    /mnt/dspace/storage             nfs     rw,tcp,intr,noatime     0 0
       - name: mount remote stores
