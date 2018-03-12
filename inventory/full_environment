@@ -23,7 +23,7 @@ db_dev
 dspace-test.mse.jhu.edu
 
 [db_test]
-psql02.mse.jhu.edu
+psql02-test
 
 [test:children]
 app_test
@@ -35,7 +35,7 @@ db_test
 dspace-stage.mse.jhu.edu
 
 [db_stage]
-psql02.mse.jhu.edu
+psql02-stage
 
 [stage:children]
 app_stage
