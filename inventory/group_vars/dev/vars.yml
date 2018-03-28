@@ -10,8 +10,15 @@ dspace_db_ip:               "{{ hostvars[groups['db'][0]]['ansible_all_ipv4_addr
 
 dspace_address:             "{{ dspace_ip }}"
 dspace_db_address:          "{{ dspace_db_ip }}"
-postgres_listen_addresses:  "localhost,{{ dspace_db_address }}"
 
 # apache vars
 domainname:                 "test"
 ssl_self_sign_cert:         true
+
+# TODO: move to all (?)
+postgres_version_major:     9
+postgres_version_minor:     6
+postgres_extra_packages:
+  - "postgresql-contrib"
+postgres_extensions:
+  - "pgcrypto"

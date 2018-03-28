@@ -32,6 +32,9 @@
       method: "md5"
       state: "present"
 
+  - name: flush handlers so pg_hba changes take effect
+    meta: flush_handlers
+
   - name: add pgpass entry for database copy
     include_role:
       name: postgres
@@ -128,6 +131,9 @@
       user: "{{ db_user }}"
       method: "md5"
       state: "absent"
+
+  - name: flush handlers so pg_hba changes take effect
+    meta: flush_handlers
 
   - name: remove pgpass entry for database copy
     include_role:
