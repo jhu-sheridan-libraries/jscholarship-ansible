@@ -52,11 +52,12 @@ db_databases:
     encoding:           "UTF-8"
     owner:              "{{ db_user }}"
 
+# TODO: use firewall config to limit access to particular IPs
 postgres_hba_entries:
 - type:                 "host"
   database:             "{{ db_name }}"
   user:                 "{{ db_user }}"
-  address:              "{{ dspace_address }}"
+  address:              "samenet"
   method:               "md5"
 
 # NOTE: db_source is the name of the production database, and needs its own var,
