@@ -5,7 +5,12 @@ login_user_passphrase:          "{{ vault_login_user_passphrase }}"
 
 # assetstore vars
 remote_stores_available:        true
-stores_fstab:                   "sam.mse.jhu.edu:/apps/dspace_snapshot"
+stores_fstab:
+- name:   "/mnt/dspace/storage"
+  src:    "sam.mse.jhu.edu:/apps/dspace_snapshot"
+  fstype: "nfs"
+  opts:   "rw,tcp,intr,noatime"
+  state:  "mounted"
 
 # apache vars
 dspace_name:                    "JScholarship-{{ environ | title }}"
