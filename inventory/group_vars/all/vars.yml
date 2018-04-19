@@ -75,6 +75,8 @@ db_transform_queries:
 # admin vars
 # members of this list will not be anonymized (no additional permissions granted):
 admin_users: "{{ vault_admin_users }}"
+# NOTE: used to create initial admin(s). most environments will inherit existing admins from the prod database
+dspace_admins: []
 
 # vars for branding
 # -----------------

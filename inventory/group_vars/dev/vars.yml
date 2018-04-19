@@ -22,3 +22,5 @@ postgres_extra_packages:
   - "postgresql-contrib"
 postgres_extensions:
   - "pgcrypto"
+# admin vars
+dspace_admins:              "{{ vault_dspace_admins }}"
