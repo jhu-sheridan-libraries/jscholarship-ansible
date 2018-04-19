@@ -37,7 +37,7 @@
       - name: check to see if we currently have unneeded symlinks
         stat:
           path: /mnt/dspace/storage
-        register: sym 
+        register: sym
 
       # NOTE: this will delete any items currently in your local assetstore
       - name: destroy symlinks to local assetstore
@@ -49,23 +49,36 @@
         when: sym.stat.islnk is defined and sym.stat.islnk
 
       # e.g. sam.mse.jhu.edu:/apps/dspace    /mnt/dspace/storage             nfs     rw,tcp,intr,noatime     0 0
+      # or:   /dev/sdc1                                       /mnt/assetstore xfs             defaults        0 0
       - name: mount remote stores
         mount:
-          name: /mnt/dspace/storage
-          src: "{{ stores_fstab }}"
-          fstype: nfs
-          opts: rw,tcp,intr,noatime
-          state: mounted
+          name:   "{{ item.name }}"
+          src:    "{{ item.src }}"
+          fstype: "{{ item.fstype }}"
+          opts:   "{{ item.opts }}"
+          state:  "{{ item.state }}"
+        with_items: "{{ stores_fstab }}"
+
+      # TODO: currently creates in the first stores_fstab entry.
+      # refine to locate the first with state: mounted
+      - name: create assetstore directories, if needed
+        file:
+          dest: "{{ stores_fstab[0].name }}/{{ item }}"
+          owner: "{{ app_user }}"
+          group: "{{ app_user }}"
+          state: "directory"
+        with_items: "{{ assetstores }}"
       when: remote_stores_available and stores_fstab != ""
 
     - block:
       - name: unmount remote stores
         mount:
-          name: /mnt/dspace/storage
-          src: "{{ stores_fstab }}"
-          fstype: nfs
-          opts: rw,tcp,intr,noatime
-          state: absent
+          name:   "{{ item.name }}"
+          src:    "{{ item.src }}"
+          fstype: "{{ item.fstype }}"
+          opts:   "{{ item.opts }}"
+          state:  "{{ item.state }}"
+        with_items: "{{ stores_fstab }}"
 
       - name: create symlinks to local assetstores
         file:

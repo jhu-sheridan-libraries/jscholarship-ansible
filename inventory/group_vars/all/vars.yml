@@ -85,7 +85,7 @@ logo:         "sheridan-libraries.logo.small.horizontal.white.svg"
 
 # assetstore vars
 remote_stores_available: false
-stores_fstab:             ""
+stores_fstab:            []
 assetstores:
   - assetstore
   - assetstore1
