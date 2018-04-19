@@ -26,11 +26,7 @@ ssl_certificate_chain_content:  "{{ vault_ssl_certificate_chain_content }}"
 
 # db vars
 db_name:                        "dspace-test"
-dspace_ip:                      "{{ vault_dspace_ip }}"
-dspace_db_ip:                   "{{ vault_dspace_db_ip }}"
-dspace_address:                 "{{ dspace_ip }}"
 dspace_db_address:              "psql02.{{ domainname }}"
-postgres_listen_addresses:      "localhost,{{ dspace_db_ip }}"
 
 # dspace vars
 # TODO: inherit this value in the dspace role

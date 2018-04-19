@@ -17,3 +17,6 @@ stores_fstab:
 #   fstype: "xfs"
 #   opts:   "defaults"
 #   state:  "absent"
+
+# db vars
+dspace_db_address:              "psql02.{{ domainname }}"

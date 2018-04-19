@@ -45,6 +45,10 @@ db_users:
   - user:               "{{ db_user }}"
     pass:               "{{ db_password }}"
     flags:              "NOSUPERUSER"
+dspace_ip:              "{{ vault_dspace_ip }}"
+dspace_db_ip:           "{{ vault_dspace_db_ip }}"
+dspace_address:         "{{ dspace_ip }}"
+dspace_db_address:      "{{ dspace_db_ip }}"
 
 db_create_databases:    true
 db_databases:

@@ -10,3 +10,6 @@ stores_fstab:
   fstype: "nfs"
   opts:   "rw,tcp,intr,noatime"
   state:  "mounted"
+
+# db vars
+dspace_db_address:              "psql03.{{ domainname }}"
