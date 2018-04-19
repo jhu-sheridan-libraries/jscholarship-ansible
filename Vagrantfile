@@ -43,6 +43,7 @@ Vagrant.configure(2) do |config|
         vb.linked_clone = true
 
         if short_name == "jscholarship"
+          vb.memory = 2048
           # port forwarding http:
           # host.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
         end
