@@ -20,16 +20,9 @@ stores_fstab:
 
 # apache vars
 dspace_name:                    "JScholarship-{{ environ | title }}"
-ssl_provided_cert:              true
 ssl_certificate_file:           "{{ vault_ssl_certificate_file }}"
 ssl_certificate_key_file:       "{{ vault_ssl_certificate_key_file }}"
 ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
-ssl_certificate_content:        "{{ vault_ssl_certificate_content }}"
-ssl_certificate_key_content:    "{{ vault_ssl_certificate_key_content }}"
-ssl_certificate_chain_content:  "{{ vault_ssl_certificate_chain_content }}"
 
 # db vars
 dspace_db_address:              "psql02.{{ domainname }}"
-
-# dspace vars
-dspace_mail_server:             "{{ vault_dspace_mail_server }}"
