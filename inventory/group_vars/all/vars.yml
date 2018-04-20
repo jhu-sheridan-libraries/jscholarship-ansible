@@ -25,8 +25,8 @@ dspace_source:        "{{ dspace_user_home }}/{{ dspace_source_dir }}"
 
 # apache vars
 dspace_name:            "JScholarship"
-hostname:               "{{ dspace_name | lower }}"
-domainname:             "library.jhu.edu"
+hostname:               "dspace-{{ environ }}"
+domainname:             "mse.jhu.edu"
 apache_https:           true
 apache_proxy_tomcat:    true
 

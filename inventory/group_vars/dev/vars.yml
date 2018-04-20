@@ -13,8 +13,12 @@ dspace_db_address:          "{{ dspace_db_ip }}"
 db_transform_queries:       []
 
 # apache vars
+# dspace_name:                "JScholarship-{{ environ | title }}"
+# TODO: move to dspace-{{ environ }}, for consistency with other environments
+hostname:                   "{{ dspace_name | lower }}"
 domainname:                 "test"
 ssl_self_sign_cert:         true
+ssl_support_legacy_clients: false
 
 # TODO: move to all (?)
 postgres_version_major:     9
