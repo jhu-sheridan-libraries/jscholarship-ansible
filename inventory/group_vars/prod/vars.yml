@@ -10,3 +10,11 @@ stores_fstab:
   fstype: "nfs"
   opts:   "rw,tcp,intr,noatime"
   state:  "mounted"
+
+# apache vars
+ssl_certificate_file:           "{{ vault_ssl_certificate_file }}"
+ssl_certificate_key_file:       "{{ vault_ssl_certificate_key_file }}"
+ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
+
+# db vars
+dspace_db_address:              "psql03.{{ domainname }}"

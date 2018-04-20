@@ -25,8 +25,8 @@ dspace_source:        "{{ dspace_user_home }}/{{ dspace_source_dir }}"
 
 # apache vars
 dspace_name:            "JScholarship"
-hostname:               "{{ dspace_name | lower }}"
-domainname:             "library.jhu.edu"
+hostname:               "dspace-{{ environ }}"
+domainname:             "mse.jhu.edu"
 apache_https:           true
 apache_proxy_tomcat:    true
 
@@ -45,6 +45,10 @@ db_users:
   - user:               "{{ db_user }}"
     pass:               "{{ db_password }}"
     flags:              "NOSUPERUSER"
+dspace_ip:              "{{ vault_dspace_ip }}"
+dspace_db_ip:           "{{ vault_dspace_db_ip }}"
+dspace_address:         "{{ dspace_ip }}"
+dspace_db_address:      "{{ dspace_db_ip }}"
 
 db_create_databases:    true
 db_databases:
@@ -75,6 +79,8 @@ db_transform_queries:
 # admin vars
 # members of this list will not be anonymized (no additional permissions granted):
 admin_users: "{{ vault_admin_users }}"
+# NOTE: used to create initial admin(s). most environments will inherit existing admins from the prod database
+dspace_admins: []
 
 # vars for branding
 # -----------------

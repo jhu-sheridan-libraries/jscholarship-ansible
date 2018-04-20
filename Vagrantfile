@@ -18,7 +18,7 @@ Vagrant.configure(2) do |config|
   elsif OS=="centos"
     # https://app.vagrantup.com/centos/boxes/7
     config.vm.box = "centos/7"
-    config.vm.box_version = "1710.01" # CentOS 7.4.1708
+    config.vm.box_version = "1802.01" # CentOS 7.4.1708
   else
     puts "you must set the OS variable to a valid value before continuing"
     exit
@@ -43,6 +43,7 @@ Vagrant.configure(2) do |config|
         vb.linked_clone = true
 
         if short_name == "jscholarship"
+          vb.memory = 2048
           # port forwarding http:
           # host.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
         end
