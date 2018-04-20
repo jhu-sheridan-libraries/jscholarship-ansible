@@ -9,21 +9,42 @@
   # become_user: "{{ app_user }}"
 
   tasks:
-  - name: include dspace role to get its handlers
-    include_role:
-      name: dspace-5
-      tasks_from: dolittle
+  - name: set up for dspace 5
+    block:
+    - name: set vars for dspace 5
+      set_fact:
+        dspace_config: "{{ dspace_source }}/dspace/config/dspace.cfg"
+
+    # TODO: with this approach, *both* "update configs" handlers get executed
+    # - name: include dspace 5 role to get its handlers
+    #   include_role:
+    #     name: dspace-5
+    #     tasks_from: dolittle
+    when: dspace_major_version == 5
+
+  - name: set up for dspace 6
+    block:
+    - name: set vars for dspace 6
+      set_fact:
+        dspace_config: "{{ dspace_install }}/config/local.cfg"
+
+    - name: include dspace 6 role to get its handlers
+      include_role:
+        name: dspace-6
+        tasks_from: dolittle
+    when: dspace_major_version == 6
+
 
   - name: request item configuration
     lineinfile:
-      dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+      dest: "{{ dspace_config }}"
       regexp: "^request.item.helpdesk.override"
       line: "request.item.helpdesk.override = {{ helpdesk_override }}"
     notify: update configs
 
   - name: use proxies
     lineinfile:
-      dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+      dest: "{{ dspace_config }}"
       regexp: "^useProxies"
       line: "useProxies = {{ use_proxies }}"
     notify: update configs
@@ -50,14 +71,14 @@
   - block:
     - name: configure assetstore 0
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dest: "{{ dspace_config }}"
         regexp: "^assetstore.dir\\s*="
         line: "assetstore.dir = /mnt/dspace/storage/assetstore"
       notify: update configs
 
     - name: configure assetstore 1
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dest: "{{ dspace_config }}"
         regexp: "^assetstore.dir.1"
         insertafter: "^assetstore.dir\\s*="
         line: "assetstore.dir.1 = /mnt/dspace/storage/assetstore1"
@@ -67,14 +88,14 @@
   - block:
     - name: configure embargo terms
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dest: "{{ dspace_config }}"
         regexp: "^embargo.field.terms"
         line: "embargo.field.terms = local.embargo.terms"
       notify: update configs
 
     - name: configure embargo lift
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dest: "{{ dspace_config }}"
         regexp: "^embargo.field.lift"
         line: "embargo.field.lift = local.embargo.lift"
       notify: update configs
@@ -103,25 +124,24 @@
   - block:
     - name: configure thumbnail width
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dest: "{{ dspace_config }}"
         regexp: "^thumbnail.maxwidth"
         line: "thumbnail.maxwidth = {{ thumbnail_maxwidth }}"
       notify: update configs
 
     - name: configure thumbnail height
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dest: "{{ dspace_config }}"
         regexp: "^thumbnail.maxheight"
         line: "thumbnail.maxheight = {{ thumbnail_maxheight }}"
       notify: update configs
   # end block - thumbnail settings
 
-  # imagemagick
-  # NOTE: this is fragile and will stop working as of v6
+  # imagemagick - 5
   - block:
     - name: switch from default thumbnail generation to imagemagick
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dest: "{{ dspace_config }}"
         regexp: '(^\s+)(Word Text Extractor)(, JPEG Thumbnail)'
         line: |
           \1\2, \
@@ -129,5 +149,32 @@
           \1ImageMagick PDF Thumbnail
         backrefs: true
       notify: update configs
-    when: thumbnail_imagemagick
+    when: thumbnail_imagemagick and dspace_major_version == 5
+    # end block - imagemagick - 5
+
+  # imagemagick - 6
+  - block:
+    - name: remove default thumbnail generation
+      lineinfile:
+        dest: "{{ dspace_install }}/config/dspace.cfg"
+        regexp: '^filter.plugins = JPEG Thumbnail'
+        state: absent
+      notify: update configs
+
+    - name: remove default PDF thumbnail generation
+      lineinfile:
+        dest: "{{ dspace_install }}/config/dspace.cfg"
+        regexp: '^filter.plugins = PDFBox JPEG Thumbnail'
+        state: absent
+      notify: update configs
+
+    - name: switch from default thumbnail generation to imagemagick
+      blockinfile:
+        dest: "{{ dspace_config }}"
+        block: |
+          filter.plugins = ImageMagick Image Thumbnail
+          filter.plugins = ImageMagick PDF Thumbnail
+        marker: "# {mark} ImageMagick Thumbnail Generation"
+      notify: update configs
+    when: thumbnail_imagemagick and dspace_major_version == 6
     # end block - imagemagick

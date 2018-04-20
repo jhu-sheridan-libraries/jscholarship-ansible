@@ -28,12 +28,18 @@
 
 - src: https://github.com/dheles/dspace-5-ansible-role.git
   name: dspace-5
+#
+- src: https://github.com/dheles/dspace-6-ansible-role.git
+  name: dspace-6
 
 - src: https://github.com/dheles/apache-ansible-role
   name: apache
 
 - src: https://github.com/dheles/imagemagick-ansible-role
   name: imagemagick
+
+- src: https://github.com/dheles/ansible-role-psi-probe
+  name: psi-probe
 
 - src: https://github.com/dheles/dspace-curation-ansible-role.git
   name: dspace-curation
