@@ -3,6 +3,21 @@ environ:                        "test" # dev || stage || prod
 debugging:                      true
 login_user_passphrase:          "{{ vault_login_user_passphrase }}"
 
+# install vars
+dspace_major_version:       6
+dspace_minor_version:       2
+
+# TODO: move to all (?)
+postgres_version_major:     9
+postgres_version_minor:     6
+postgres_extra_packages:
+  - "postgresql-contrib"
+postgres_extensions:
+  - "pgcrypto"
+
+postgres_upgrade_ok:        true
+postgres_upgrade_cleanup:   true
+
 # assetstore vars
 remote_stores_available:        true
 stores_fstab:
