@@ -5,5 +5,13 @@
 - name: install dspace
   hosts: app
 
-  roles:
-  - { role: dspace-5, tags: ['dspace'] }
+  tasks:
+  - include_role:
+      name: dspace-5
+    tags: ['dspace']
+    when: dspace_major_version == 5
+
+  - include_role:
+      name: dspace-6
+    tags: ['dspace']
+    when: dspace_major_version == 6

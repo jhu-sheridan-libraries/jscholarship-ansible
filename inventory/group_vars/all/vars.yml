@@ -71,10 +71,17 @@ db_backup_file:   "{{ db_name }}_{{ environ }}_backup.sql"
 copy_db_name:     "{{ db_source }}_copy"
 copy_backup_file: "{{ copy_db_name }}_backup.sql"
 db_retain_backup:       true
+postgres_backup_args:
+  - "format=custom"
+  - "no-owner"
 
 # data transform queries
 db_transform_queries:
 - "anonymize_db.sql.j2"
+
+# dspace vars
+dspace_db_name:                 "{{ db_name }}"
+dspace_mail_server:             "{{ vault_dspace_mail_server }}"
 
 # admin vars
 # members of this list will not be anonymized (no additional permissions granted):
@@ -106,6 +113,7 @@ bulk_edit_limit:          500
 thumbnail_maxwidth:       200
 thumbnail_maxheight:      200
 thumbnail_imagemagick:    true
+thumbnail_lists:          false
 
 # logging vars
 # TODO: incorporate logrotate
@@ -134,3 +142,6 @@ dspace_curation_tasks:
     loglevel:               "ERROR"
     # NOTE: set this var to override the log template for *this* curation task
     # log_template:           "templates/log4j-curation.properties.j2"
+
+# upgrade vars
+dspace_backup_default_assetstore: false

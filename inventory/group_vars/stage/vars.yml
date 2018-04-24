@@ -2,16 +2,34 @@
 environ:                        "stage" # dev || stage || prod
 login_user_passphrase:          "{{ vault_login_user_passphrase }}"
 
+# install vars
+dspace_major_version:       6
+dspace_minor_version:       2
+
+# TODO: move to all (?)
+postgres_version_major:     9
+postgres_version_minor:     6
+postgres_extra_packages:
+  - "postgresql-contrib"
+postgres_extensions:
+  - "pgcrypto"
+
+postgres_upgrade_ok:        true
+postgres_upgrade_cleanup:   true
+
 # assetstore vars
-remote_stores_available:        false
-# stores_fstab:             "sam.mse.jhu.edu:/apps/dspace_snapshot"
-# /dev/sdc1                                       /mnt/assetstore xfs             defaults        0 0
+remote_stores_available:        true
 stores_fstab:
 - name:   "/mnt/dspace/storage"
-  src:    "/dev/sdc1"
-  fstype: "xfs"
-  opts:   "defaults"
-  state:  "absent"
+  src:    "sam.mse.jhu.edu:/apps/dspace_snapshot"
+  fstype: "nfs"
+  opts:   "rw,tcp,intr,noatime"
+  state:  "mounted"
+# - name:   "/mnt/dspace/storage"
+#   src:    "/dev/sdc1"
+#   fstype: "xfs"
+#   opts:   "defaults"
+#   state:  "absent"
 # - name:   "/mnt/assetstore"
 #   src:    "/dev/sdc1"
 #   fstype: "xfs"
@@ -20,16 +38,10 @@ stores_fstab:
 
 # apache vars
 dspace_name:                    "JScholarship-{{ environ | title }}"
-ssl_provided_cert:              true
 ssl_certificate_file:           "{{ vault_ssl_certificate_file }}"
 ssl_certificate_key_file:       "{{ vault_ssl_certificate_key_file }}"
 ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
-ssl_certificate_content:        "{{ vault_ssl_certificate_content }}"
-ssl_certificate_key_content:    "{{ vault_ssl_certificate_key_content }}"
-ssl_certificate_chain_content:  "{{ vault_ssl_certificate_chain_content }}"
 
 # db vars
 dspace_db_address:              "psql02.{{ domainname }}"
-
-# dspace vars
-dspace_mail_server:             "{{ vault_dspace_mail_server }}"
+db_transform_queries:           []

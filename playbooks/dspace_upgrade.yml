@@ -1,0 +1,26 @@
+- name: backup database
+  include:  db_backup.yml
+  tags:     ['db']
+- include:  dspace_prereqs.yml
+  tags:     ['prereqs']
+- name:     install appropriate database version
+  include:  db_install.yml
+  tags:     ['db']
+
+- name: upgrade dspace
+  hosts: app
+
+  tasks:
+  - include_role:
+      name: dspace-6
+      tasks_from: main_upgrade
+    when: dspace_major_version == 6
+
+  # TODO ?
+  # - include_role:
+  #     name: dspace-5
+  #     tasks_from: upgrade
+  #   when: dspace_major_version == 5
+
+- include:  dspace_post_install.yml
+  tags:     ['dspace','post']
