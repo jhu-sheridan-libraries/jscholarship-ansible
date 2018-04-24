@@ -18,15 +18,18 @@ postgres_upgrade_ok:        true
 postgres_upgrade_cleanup:   true
 
 # assetstore vars
-remote_stores_available:        false
-# stores_fstab:             "sam.mse.jhu.edu:/apps/dspace_snapshot"
-# /dev/sdc1                                       /mnt/assetstore xfs             defaults        0 0
+remote_stores_available:        true
 stores_fstab:
 - name:   "/mnt/dspace/storage"
-  src:    "/dev/sdc1"
-  fstype: "xfs"
-  opts:   "defaults"
-  state:  "absent"
+  src:    "sam.mse.jhu.edu:/apps/dspace_snapshot"
+  fstype: "nfs"
+  opts:   "rw,tcp,intr,noatime"
+  state:  "mounted"
+# - name:   "/mnt/dspace/storage"
+#   src:    "/dev/sdc1"
+#   fstype: "xfs"
+#   opts:   "defaults"
+#   state:  "absent"
 # - name:   "/mnt/assetstore"
 #   src:    "/dev/sdc1"
 #   fstype: "xfs"
