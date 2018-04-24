@@ -26,3 +26,4 @@ ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
 
 # db vars
 dspace_db_address:              "psql02.{{ domainname }}"
+db_transform_queries:           []
