@@ -37,3 +37,6 @@ ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
 db_name:                        "dspace-test"
 dspace_db_address:              "psql02.{{ domainname }}"
 db_transform_queries:           []
+
+# config vars
+thumbnail_lists:                true

@@ -113,6 +113,7 @@ bulk_edit_limit:          500
 thumbnail_maxwidth:       200
 thumbnail_maxheight:      200
 thumbnail_imagemagick:    true
+thumbnail_lists:          false
 
 # logging vars
 # TODO: incorporate logrotate

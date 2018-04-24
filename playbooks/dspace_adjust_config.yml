@@ -190,3 +190,14 @@
     notify: update configs
     when: dspace_major_version == 6
   # end block - SWORD v2
+
+  # customize list views
+  - name: add thumbs to list views
+    blockinfile:
+      dest: "{{ dspace_config }}"
+      block: |
+        xmlui.theme.mirage.item-list.emphasis = file
+      marker: "# {mark} customize list views"
+    notify: update configs
+    when: thumbnail_lists and dspace_major_version == 6
+  # end block - customize list views
