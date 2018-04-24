@@ -2,3 +2,5 @@
 # NOTE: only really works with full_environment inventory or emulation thereof
 - include: db_backup.yml
 - include: db_deploy_backup.yml
+# NOTE: only really needed when refreshing data from an older dspace version
+- include: dspace_upgrade_data.yml
