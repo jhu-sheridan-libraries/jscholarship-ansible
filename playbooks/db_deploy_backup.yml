@@ -40,6 +40,15 @@
         src: "../db_backup/{{ backup_file }}"
         dest: "~/{{ backup_file }}"
 
+    - name: set version-specific vars
+      include_role:
+        name: postgres
+        tasks_from: set_vars
+      vars:
+        upgrading: false
+        version_major: "{{ postgres_version_major }}"
+        version_minor: "{{ postgres_version_minor }}"
+
     - name: add pg_hba entry for database
       include_role:
         name: postgres
