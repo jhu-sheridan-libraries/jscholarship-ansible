@@ -178,3 +178,15 @@
       notify: update configs
     when: thumbnail_imagemagick and dspace_major_version == 6
     # end block - imagemagick
+
+  # SWORD v2
+  - name: adjust SWORD v2 configuration
+    blockinfile:
+      dest: "{{ dspace_config }}"
+      block: |
+        swordv2-server.on-behalf-of.enable = true
+        swordv2-server.verbose-description.receipt.enable = true
+      marker: "# {mark} SWORD v2 server configuration"
+    notify: update configs
+    when: dspace_major_version == 6
+  # end block - SWORD v2
