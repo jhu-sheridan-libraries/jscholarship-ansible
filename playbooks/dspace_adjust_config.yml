@@ -201,3 +201,14 @@
     notify: update configs
     when: thumbnail_lists and dspace_major_version == 6
   # end block - customize list views
+
+  - name: dis/enable email
+    blockinfile:
+      dest: "{{ dspace_config }}"
+      block: |
+        # NOTE: loglevel must be set to INFO or above for disabled email to be logged
+        # changes to loglevel (unlike this setting) require tomcat restart
+        mail.server.disabled = {{ email_disabled }}
+      marker: "# {mark} disable email"
+    notify: update configs
+    when: email_disabled

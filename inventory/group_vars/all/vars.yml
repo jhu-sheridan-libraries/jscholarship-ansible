@@ -114,6 +114,7 @@ thumbnail_maxwidth:       200
 thumbnail_maxheight:      200
 thumbnail_imagemagick:    true
 thumbnail_lists:          false
+email_disabled:           false
 
 # logging vars
 # TODO: incorporate logrotate
