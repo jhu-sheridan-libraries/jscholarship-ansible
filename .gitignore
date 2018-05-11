@@ -12,6 +12,7 @@
 roles/*
 !roles/README.md
 !roles/local.*
+playbooks/test_*
 
 # db_backup
 db_backup/*
