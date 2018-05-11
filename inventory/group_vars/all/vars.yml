@@ -146,3 +146,15 @@ dspace_curation_tasks:
 
 # upgrade vars
 dspace_backup_default_assetstore: false
+
+# shibboleth sp vars
+shib_sp_cert:                     "{{ vault_shib_sp_cert }}"
+shib_sp_key:                      "{{ vault_shib_sp_key }}"
+shib_virtualhost_template:        "templates/shib-virtualhost.j2"
+shib_attribute_template:          "templates/vault-shib-attribute-map.xml"
+shib_config_template:             "templates/vault-shibboleth2.xml"
+shib_idp_metadata:
+- filename: "idpjhedu-metadata.xml"
+  src: "templates/vault-idpjhedu-metadata.xml"
+- filename: "ITatJH-prod-idp-metadata.xml"
+  src: "templates/vault-ITatJH-prod-idp-metadata.xml"

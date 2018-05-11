@@ -12,6 +12,7 @@
 roles/*
 !roles/README.md
 !roles/local.*
+playbooks/templates/shibconfigs*
 playbooks/test_*
 
 # db_backup

@@ -43,3 +43,6 @@
 
 - src: https://github.com/dheles/dspace-curation-ansible-role.git
   name: dspace-curation
+
+- src: https://github.com/dheles/shibboleth-sp-ansible-role.git
+  name: shibboleth-sp
