@@ -228,3 +228,37 @@
       marker: "# {mark} disable email"
     notify: update configs
     when: email_disabled
+
+  - name: hostname override
+    block:
+      - name: set dspace (not apache) hostname
+        lineinfile:
+          dest: "{{ dspace_config }}"
+          regexp: "^dspace.hostname"
+          line: "dspace.hostname = {{ dspace_hostname_override }}"
+        notify: update configs
+
+      - name: set xmlui.public.logout so hostname is used for logout redirect
+        lineinfile:
+          dest: "{{ dspace_config }}"
+          regexp: "^xmlui.public.logout"
+          line: "xmlui.public.logout = true"
+        notify: update configs
+    when: dspace_hostname_override is defined
+
+  - name: hostname default
+    block:
+      - name: set dspace (not apache) hostname
+        lineinfile:
+          dest: "{{ dspace_config }}"
+          regexp: "^dspace.hostname"
+          line: "dspace.hostname = {{ hostname }}.{{ domainname }}"
+        notify: update configs
+
+      - name: unset xmlui.public.logout
+        lineinfile:
+          dest: "{{ dspace_config }}"
+          regexp: "^xmlui.public.logout"
+          state: absent
+        notify: update configs
+    when: dspace_hostname_override is not defined
