@@ -5,6 +5,9 @@
 *.retry
 *.cache
 
+# python
+.ropeproject
+
 # local
 roles/*
 !roles/README.md
