@@ -53,17 +53,27 @@
       line: "useProxies = {{ use_proxies }}"
     notify: update configs
 
-  - name: configure authentication methods
-    template:
-      src: templates/authentication.cfg.j2
-      dest: "{{ dspace_source }}/dspace/config/modules/authentication.cfg"
-    notify: update configs
+  - name: authentication - 5
+    block:
+    - name: configure authentication methods
+      template:
+        src: templates/authentication.cfg.j2
+        dest: "{{ dspace_config_dir }}/modules/authentication.cfg"
+      notify: update configs
 
-  - name: configure shibboleth authentication
+    - name: configure shibboleth authentication
+      template:
+        src: templates/authentication-shibboleth.cfg.j2
+        dest: "{{ dspace_config_dir }}/modules/authentication-shibboleth.cfg"
+      notify: update configs
+    when: dspace_major_version == 5
+
+  - name: configure shibboleth authentication - 6
     template:
-      src: templates/authentication-shibboleth.cfg.j2
-      dest: "{{ dspace_source }}/dspace/config/modules/authentication-shibboleth.cfg"
+      src: templates/authentication-shibboleth-6.cfg.j2
+      dest: "{{ dspace_config_dir }}/modules/authentication-shibboleth.cfg"
     notify: update configs
+    when: dspace_major_version == 6
 
   - name: template default license
     template:

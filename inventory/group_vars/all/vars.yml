@@ -147,6 +147,11 @@ dspace_curation_tasks:
 # upgrade vars
 dspace_backup_default_assetstore: false
 
+# authentication vars
+dspace_auth_password:             true
+dspace_auth_shib:                 true
+dspace_auth_shib_loginurl:        "/Shibboleth.sso/Login" #"https://jscholarship.library.jhu.edu/Shibboleth.sso/Login"
+
 # shibboleth sp vars
 shib_sp_cert:                     "{{ vault_shib_sp_cert }}"
 shib_sp_key:                      "{{ vault_shib_sp_key }}"
