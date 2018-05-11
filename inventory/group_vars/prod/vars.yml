@@ -18,3 +18,6 @@ ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
 
 # db vars
 dspace_db_address:              "psql03.{{ domainname }}"
+
+# config vars
+dspace_hostname_override:       "jscholarship.library.jhu.edu"
