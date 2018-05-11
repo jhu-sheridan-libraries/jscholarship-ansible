@@ -1,0 +1,14 @@
+- name: install shibboleth sp
+  hosts: shib_sp
+
+  tasks:
+  - name: include apache role to get its "restart apache" handler
+    include_role:
+      name: apache
+      tasks_from: dolittle
+    vars:
+      apache_service: "httpd"
+
+  - include_role:
+      name: shibboleth-sp
+      tags: [shib]

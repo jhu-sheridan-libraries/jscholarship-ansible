@@ -5,10 +5,15 @@
 *.retry
 *.cache
 
+# python
+.ropeproject
+
 # local
 roles/*
 !roles/README.md
 !roles/local.*
+playbooks/templates/shibconfigs*
+playbooks/test_*
 
 # db_backup
 db_backup/*

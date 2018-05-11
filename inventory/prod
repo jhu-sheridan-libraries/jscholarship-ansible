@@ -12,3 +12,9 @@ psql03.mse.jhu.edu
 [prod:children]
 app
 db
+
+# groups to emulate full environment:
+[db_prod:children]
+db
+[app_prod:children]
+app

@@ -1,0 +1,49 @@
+##############################
+# mod_shib configuration
+##############################
+
+LoadModule mod_shib /usr/lib64/shibboleth/mod_shib_24.so
+
+# As long as Shibboleth module is installed, enable all Shibboleth/mod_shib related settings
+<IfModule mod_shib>
+  # Shibboleth recommends turning on UseCanonicalName
+  # See "Prepping Apache" in https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApacheConfig
+  UseCanonicalName Off
+
+  # Most DSpace instances will want to use Shibboleth "Lazy Session", which ensures that users
+  # can access DSpace without first authenticating via Shibboleth.
+  # This section turns on Shibboleth "Lazy Session". Also ensures that once they have authenticated
+  # (by accessing /Shibboleth.sso/Login path), then their Shib session is kept alive
+  <Location />
+    AuthType shibboleth
+    ShibRequireSession Off
+    require shibboleth
+    # ShibRequestSetting applicationId itjh-prod
+    # ShibRequestSetting applicationId itjh-test
+  </Location>
+
+  # If a user attempts to access the DSpace shibboleth login page, force them to authenticate via Shib
+  <Location "/shibboleth-login">
+    AuthType shibboleth
+    ShibRequireSession On
+    # Please note that setting ShibUseHeaders to "On" is a potential security risk.
+    # You may wish to set it to "Off". See the mod_shib docs for details about this setting:
+    # https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApacheConfig#NativeSPApacheConfig-AuthConfigOptions
+    # Here's a good guide to configuring Apache + Tomcat when this setting is "Off":
+    # https://www.switch.ch/de/aai/support/serviceproviders/sp-access-rules.html#javaapplications
+    ShibUseHeaders On
+    require valid-user
+  </Location>
+
+  # Ensure /Shibboleth.sso path (in Apache) can be accessed
+  # By default it may be inaccessible if your Apache security is tight.
+  <Location "/Shibboleth.sso">
+    Order deny,allow
+    Allow from all
+    # Also ensure Shibboleth/mod_shib responds to this path
+    SetHandler shib
+  </Location>
+
+  # Finally, do not redirect requests to Shibboleth (these should be handled by mod_shib instead)
+  ProxyPass /Shibboleth.sso !
+</IfModule>

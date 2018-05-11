@@ -9,9 +9,13 @@ dspace-stage.mse.jhu.edu
 [db]
 psql02.mse.jhu.edu
 
+[shib_sp]
+dspace-stage.mse.jhu.edu
+
 [stage:children]
 app
 db
+shib_sp
 
 # groups to emulate full environment:
 [db_prod:children]

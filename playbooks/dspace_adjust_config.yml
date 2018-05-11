@@ -13,7 +13,9 @@
     block:
     - name: set vars for dspace 5
       set_fact:
-        dspace_config: "{{ dspace_source }}/dspace/config/dspace.cfg"
+        dspace_config_dir:  "{{ dspace_source }}/dspace/config"
+    - set_fact:
+        dspace_config:      "{{ dspace_config_dir }}/dspace.cfg"
 
     # TODO: with this approach, *both* "update configs" handlers get executed
     # - name: include dspace 5 role to get its handlers
@@ -26,7 +28,9 @@
     block:
     - name: set vars for dspace 6
       set_fact:
-        dspace_config: "{{ dspace_install }}/config/local.cfg"
+        dspace_config_dir:  "{{ dspace_source }}/dspace/config"
+    - set_fact:
+        dspace_config:      "{{ dspace_config_dir }}/local.cfg"
 
     - name: include dspace 6 role to get its handlers
       include_role:
@@ -49,22 +53,32 @@
       line: "useProxies = {{ use_proxies }}"
     notify: update configs
 
-  - name: configure authentication methods
-    template:
-      src: templates/authentication.cfg.j2
-      dest: "{{ dspace_source }}/dspace/config/modules/authentication.cfg"
-    notify: update configs
+  - name: authentication - 5
+    block:
+    - name: configure authentication methods
+      template:
+        src: templates/authentication.cfg.j2
+        dest: "{{ dspace_config_dir }}/modules/authentication.cfg"
+      notify: update configs
 
-  - name: configure shibboleth authentication
+    - name: configure shibboleth authentication
+      template:
+        src: templates/authentication-shibboleth.cfg.j2
+        dest: "{{ dspace_config_dir }}/modules/authentication-shibboleth.cfg"
+      notify: update configs
+    when: dspace_major_version == 5
+
+  - name: configure shibboleth authentication - 6
     template:
-      src: templates/authentication-shibboleth.cfg.j2
-      dest: "{{ dspace_source }}/dspace/config/modules/authentication-shibboleth.cfg"
+      src: templates/authentication-shibboleth-6.cfg.j2
+      dest: "{{ dspace_config_dir }}/modules/authentication-shibboleth.cfg"
     notify: update configs
+    when: dspace_major_version == 6
 
   - name: template default license
     template:
       src: templates/default.license.j2
-      dest: "{{ dspace_source }}/dspace/config/default.license"
+      dest: "{{ dspace_config_dir }}/default.license"
     notify: update configs
 
   # configure assetstores
@@ -102,7 +116,7 @@
 
     - name: raise bulk edit limit
       lineinfile:
-        dest: "{{ dspace_source }}/dspace/config/modules/bulkedit.cfg"
+        dest: "{{ dspace_config_dir }}/modules/bulkedit.cfg"
         regexp: "^gui-item-limit"
         line: "gui-item-limit = {{ bulk_edit_limit }}"
       notify: update configs
@@ -111,13 +125,13 @@
   - name: configure logging
     template:
       src: templates/log4j.properties.j2
-      dest: "{{ dspace_source }}/dspace/config/log4j.properties"
+      dest: "{{ dspace_config_dir }}/log4j.properties"
     notify: update configs
 
   - name: configure logging - solr
     template:
       src: templates/log4j-solr.properties.j2
-      dest: "{{ dspace_source }}/dspace/config/log4j-solr.properties"
+      dest: "{{ dspace_config_dir }}/log4j-solr.properties"
     notify: update configs
 
   # thumbnail settings
@@ -154,16 +168,18 @@
 
   # imagemagick - 6
   - block:
+    # TODO: test the necessity of these removals from dspace.cfg,
+    # as we are resetting the value of this property in local.cfg anyway
     - name: remove default thumbnail generation
       lineinfile:
-        dest: "{{ dspace_install }}/config/dspace.cfg"
+        dest: "{{ dspace_config_dir }}/dspace.cfg"
         regexp: '^filter.plugins = JPEG Thumbnail'
         state: absent
       notify: update configs
 
     - name: remove default PDF thumbnail generation
       lineinfile:
-        dest: "{{ dspace_install }}/config/dspace.cfg"
+        dest: "{{ dspace_config_dir }}/dspace.cfg"
         regexp: '^filter.plugins = PDFBox JPEG Thumbnail'
         state: absent
       notify: update configs
@@ -201,3 +217,14 @@
     notify: update configs
     when: thumbnail_lists and dspace_major_version == 6
   # end block - customize list views
+
+  - name: dis/enable email
+    blockinfile:
+      dest: "{{ dspace_config }}"
+      block: |
+        # NOTE: loglevel must be set to INFO or above for disabled email to be logged
+        # changes to loglevel (unlike this setting) require tomcat restart
+        mail.server.disabled = {{ email_disabled }}
+      marker: "# {mark} disable email"
+    notify: update configs
+    when: email_disabled

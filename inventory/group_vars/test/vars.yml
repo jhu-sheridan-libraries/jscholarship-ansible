@@ -40,3 +40,7 @@ db_transform_queries:           []
 
 # config vars
 thumbnail_lists:                true
+email_disabled:                 true
+
+# logging vars
+loglevel_dspace:  "INFO"

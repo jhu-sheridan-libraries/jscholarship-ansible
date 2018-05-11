@@ -9,9 +9,13 @@ jscholarship.test
 [db]
 jscholarship-db.test
 
+[shib_sp]
+jscholarship.test
+
 [dev:children]
 app
 db
+shib_sp
 
 # groups to emulate full environment:
 [db_prod:children]

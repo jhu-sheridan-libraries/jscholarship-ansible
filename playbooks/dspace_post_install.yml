@@ -1,4 +1,4 @@
 ---
-- include: dspace_branding.yml
 - include: mount_assetstores.yml
 - include: dspace_adjust_config.yml
+- include: dspace_branding.yml
