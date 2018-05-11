@@ -3,7 +3,7 @@
 
 # setup vars
 project:        "jscholarship"
-version:        "0.1.0"
+version:        "1.0.0"
 login_user:     "deploy"
 login_group:    "{{ login_user }}"
 
@@ -14,14 +14,24 @@ set_up_tests:   true
 app_user:       "dspace"
 
 # install vars
-dspace_major_version: 5
-dspace_minor_version: 8
+dspace_major_version: 6
+dspace_minor_version: 2
 dspace_version:       "{{ dspace_major_version }}.{{ dspace_minor_version }}"
 dspace_install_dir:   "/opt"
 dspace_install:       "{{ dspace_install_dir }}/dspace"
 dspace_user_home:     "/home/{{ app_user }}"
 dspace_source_dir:    "dspace-{{ dspace_version }}"
 dspace_source:        "{{ dspace_user_home }}/{{ dspace_source_dir }}"
+
+postgres_version_major:     9
+postgres_version_minor:     6
+postgres_extra_packages:
+  - "postgresql-contrib"
+postgres_extensions:
+  - "pgcrypto"
+
+postgres_upgrade_ok:        true
+postgres_upgrade_cleanup:   true
 
 # apache vars
 dspace_name:            "JScholarship"
@@ -107,7 +117,7 @@ assetstores:
 dspace_handle_canonical_prefix: "http://jhir.library.jhu.edu/handle/"
 dspace_handle_prefix:     1774.2
 helpdesk_override:        true
-# TODO: set true for prod
+# TODO: set true for prod (?)
 use_proxies:              false
 bulk_edit_limit:          500
 thumbnail_maxwidth:       200
