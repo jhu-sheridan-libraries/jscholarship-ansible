@@ -1,0 +1,114 @@
+<VirtualHost *:80>
+  ServerName {{ hostname }}
+  ServerAlias {{ fqdn }}
+
+{% if apache_https %}
+# BEGIN http redirect
+  Redirect "/" "https://{{ fqdn }}/"
+# END http redirect
+{% elif apache_proxy_tomcat %}
+# BEGIN proxying tomcat
+  ProxyPass           / ajp://localhost:{{ ajp_port }}/
+  ProxyPassReverse    / ajp://localhost:{{ ajp_port }}/
+# END proxying tomcat
+{% endif %}
+
+# BEGIN http logging
+  LogLevel {{ apache_log_level }}
+  ErrorLog "/var/log/httpd/{{ hostname }}-error.log"
+  CustomLog "/var/log/httpd/{{ hostname }}-access.log" combined
+# END http logging
+</VirtualHost>
+
+{% if apache_https %}
+<VirtualHost *:443>
+  ServerName {{ fqdn }}
+  ServerAlias {{ fqdn }}
+
+{% if apache_proxy_tomcat %}
+# BEGIN proxying tomcat
+{% if PASS_config %}
+  # using FQDN, rather than ajp for compatibility with PASS
+  ProxyPass           / http://{{ fqdn }}:{{ default_port }}/
+  ProxyPassReverse    / http://{{ fqdn }}:{{ default_port }}/
+# END proxying tomcat
+{% else %}
+  ProxyPass           / ajp://localhost:{{ ajp_port }}/
+  ProxyPassReverse    / ajp://localhost:{{ ajp_port }}/
+{% endif %}
+# END proxying tomcat
+{% endif %}
+
+# BEGIN header modification
+  RequestHeader unset X-Forwarded-Host
+# END header modification
+
+# BEGIN https logging
+  LogLevel {{ apache_log_level }}
+  ErrorLog "/var/log/httpd/{{ hostname }}-ssl-error.log"
+  CustomLog "/var/log/httpd/{{ hostname }}-ssl-access.log" combined
+# END https logging
+
+  SSLEngine on
+
+  #vSSLProtocol all -SSLv2
+  # SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5:!SEED:!IDEA
+
+  SSLCertificateFile {{ ssl_certificate_path }}/{{ ssl_certificate_file }}
+  SSLCertificateKeyFile {{ ssl_certificate_key_path }}/{{ ssl_certificate_key_file }}
+{% if ssl_certificate_chain_file | default(false) %}
+  SSLCertificateChainFile {{ ssl_certificate_path }}/{{ ssl_certificate_chain_file }}
+{% endif %}
+
+</VirtualHost>
+
+# BEGIN ssl config
+# Begin recommendations from:
+# https://www.digitalocean.com/community/tutorials/how-to-create-an-ssl-certificate-on-apache-for-centos-7
+# (in turn) from https://cipherli.st/
+# and https://raymii.org/s/tutorials/Strong_SSL_Security_On_Apache2.html
+
+{% if ssl_support_legacy_clients %}
+
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH:ECDHE-RSA-AES128-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA128:DHE-RSA-AES128-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA128:ECDHE-RSA-AES128-SHA384:ECDHE-RSA-AES128-SHA128:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA128:DHE-RSA-AES128-SHA128:DHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA384:AES128-GCM-SHA128:AES128-SHA128:AES128-SHA128:AES128-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4
+SSLProtocol All -SSLv2 -SSLv3
+SSLHonorCipherOrder On
+# Disable preloading HSTS for now.  You can use the commented out header line that includes
+# the "preload" directive if you understand the implications.
+#Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains"
+Header always set X-Frame-Options DENY
+Header always set X-Content-Type-Options nosniff
+# Requires Apache >= 2.4
+SSLCompression off
+SSLUseStapling off
+SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+# Requires Apache >= 2.4.11
+# SSLSessionTickets Off
+
+{% else %}
+
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+SSLProtocol All -SSLv2 -SSLv3
+SSLHonorCipherOrder On
+# Disable preloading HSTS for now.  You can use the commented out header line that includes
+# the "preload" directive if you understand the implications.
+#Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains"
+Header always set X-Frame-Options DENY
+Header always set X-Content-Type-Options nosniff
+# Requires Apache >= 2.4
+SSLCompression off
+SSLUseStapling off
+SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+# Requires Apache >= 2.4.11
+# SSLSessionTickets Off
+
+{% endif %}
+# END ssl config
+
+{% endif %}
+
+# BEGIN trace config
+  TraceEnable off
+# END trace config
