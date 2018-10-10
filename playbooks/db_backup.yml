@@ -1,4 +1,5 @@
 ---
+# NOTE: requires full_environment inventory or emulation thereof
 - name: create working copy of source database
   hosts: db_prod
 
@@ -7,6 +8,11 @@
     include_role:
       name: postgres
       tasks_from: ansible_prereqs
+
+  - name: make sure postgres is on the path
+    include_role:
+      name: postgres
+      tasks_from: path
 
   - name: set version-specific vars
     include_role:
@@ -28,17 +34,6 @@
       method: "md5"
       state: "present"
 
-  - name: add pg_hba entry for database copy
-    include_role:
-      name: postgres
-      tasks_from: pg_hba_entry
-    vars:
-      type: "local"
-      database: "{{ copy_db_name }}"
-      user: "{{ db_user }}"
-      method: "md5"
-      state: "present"
-
   - name: add pg_hba entry for postgres_admin_user
     include_role:
       name: postgres
@@ -52,18 +47,6 @@
 
   - name: flush handlers so pg_hba changes take effect
     meta: flush_handlers
-
-  - name: add pgpass entry for database copy
-    include_role:
-      name: postgres
-      tasks_from: pgpass
-    vars:
-      admin_user: "{{ login_user }}"
-      admin_group: "{{ login_group }}"
-      database: "{{ copy_db_name }}"
-      user: "{{ db_user }}"
-      password: "{{ db_password }}"
-      state: "present"
 
   - name: add pgpass entry for source database
     include_role:
@@ -86,58 +69,100 @@
       user: "{{ db_user }}"
       backup_file: "{{ db_backup_file }}"
 
-  # TODO: if there are no transform queries, we don't need the copy
-  - name: restore database copy from source database
-    include_role:
-      name: postgres
-      tasks_from: restore_db
-    vars:
-      database: "{{ copy_db_name }}"
-      user: "{{ db_user }}"
-      backup_file: "{{ db_backup_file }}"
+  # begin: db transform block
+  - name: create copy of source database for transformation
+    block:
+    - name: add pg_hba entry for database copy
+      include_role:
+        name: postgres
+        tasks_from: pg_hba_entry
+      vars:
+        type: "local"
+        database: "{{ copy_db_name }}"
+        user: "{{ db_user }}"
+        method: "md5"
+        state: "present"
 
-  - name: check transform_queries
-    debug: var=db_transform_queries
+    - name: flush handlers so pg_hba changes take effect
+      meta: flush_handlers
 
-  - name: run queries to transform database
-    include_role:
-      name: postgres
-      tasks_from: query_db
-    vars:
-      admin_user: "{{ login_user }}"
-      admin_group: "{{ login_group }}"
-      database: "{{ copy_db_name }}"
-      user: "{{ db_user }}"
-      query_file: "queries/{{ item }}"
-    with_items: "{{ db_transform_queries }}"
-    when: db_transform_queries
+    - name: add pgpass entry for database copy
+      include_role:
+        name: postgres
+        tasks_from: pgpass
+      vars:
+        admin_user: "{{ login_user }}"
+        admin_group: "{{ login_group }}"
+        database: "{{ copy_db_name }}"
+        user: "{{ db_user }}"
+        password: "{{ db_password }}"
+        state: "present"
 
-  - name: backup database copy
-    include_role:
-      name: postgres
-      tasks_from: backup_db
-    vars:
-      database: "{{ copy_db_name }}"
-      user: "{{ db_user }}"
-      backup_file: "{{ copy_backup_file }}"
+    - name: restore database copy from source database
+      include_role:
+        name: postgres
+        tasks_from: restore_db
+      vars:
+        database: "{{ copy_db_name }}"
+        user: "{{ db_user }}"
+        backup_file: "{{ db_backup_file }}"
 
-  - name: drop database copy
-    include_role:
-      name: postgres
-      tasks_from: drop_db
-    vars:
-      database: "{{ copy_db_name }}"
+    - name: check transform_queries
+      debug: var=db_transform_queries
 
-  - name: remove pg_hba entry for database copy
-    include_role:
-      name: postgres
-      tasks_from: pg_hba_entry
-    vars:
-      type: "local"
-      database: "{{ copy_db_name }}"
-      user: "{{ db_user }}"
-      method: "md5"
-      state: "absent"
+    - name: run queries to transform database
+      include_role:
+        name: postgres
+        tasks_from: query_db
+      vars:
+        admin_user: "{{ login_user }}"
+        admin_group: "{{ login_group }}"
+        database: "{{ copy_db_name }}"
+        user: "{{ db_user }}"
+        query_file: "queries/{{ item }}"
+      with_items: "{{ db_transform_queries }}"
+
+    - name: backup database copy
+      include_role:
+        name: postgres
+        tasks_from: backup_db
+      vars:
+        database: "{{ copy_db_name }}"
+        user: "{{ db_user }}"
+        backup_file: "{{ copy_backup_file }}"
+
+    - name: drop database copy
+      include_role:
+        name: postgres
+        tasks_from: drop_db
+      vars:
+        database: "{{ copy_db_name }}"
+
+    - name: remove pg_hba entry for database copy
+      include_role:
+        name: postgres
+        tasks_from: pg_hba_entry
+      vars:
+        type: "local"
+        database: "{{ copy_db_name }}"
+        user: "{{ db_user }}"
+        method: "md5"
+        state: "absent"
+
+    - name: remove pgpass entry for database copy
+      include_role:
+        name: postgres
+        tasks_from: pgpass
+      vars:
+        admin_user: "{{ login_user }}"
+        admin_group: "{{ login_group }}"
+        database: "{{ copy_db_name }}"
+        user: "{{ db_user }}"
+        password: "{{ db_password }}"
+        state: "absent"
+
+    when: db_transform_queries is defined
+    # end: db transform block
 
   # TODO: review
   - name: remove pg_hba entry for source database
@@ -153,18 +178,6 @@
 
   - name: flush handlers so pg_hba changes take effect
     meta: flush_handlers
-
-  - name: remove pgpass entry for database copy
-    include_role:
-      name: postgres
-      tasks_from: pgpass
-    vars:
-      admin_user: "{{ login_user }}"
-      admin_group: "{{ login_group }}"
-      database: "{{ copy_db_name }}"
-      user: "{{ db_user }}"
-      password: "{{ db_password }}"
-      state: "absent"
 
   - name: remove pgpass entry for source database
     include_role:
