@@ -1,30 +1,12 @@
 # setup vars
 environ:                "dev" # dev || stage || prod
 debugging:              true
-login_user_passphrase:  "{{ vault_login_user_passphrase }}"
-
-# install vars
-dspace_major_version:       6
-dspace_minor_version:       2
-
-# TODO: move to all (?)
-postgres_version_major:     9
-postgres_version_minor:     6
-postgres_extra_packages:
-  - "postgresql-contrib"
-postgres_extensions:
-  - "pgcrypto"
-
-postgres_upgrade_ok:        true
-postgres_upgrade_cleanup:   true
 
 # db vars
 dspace_ip:                  "{{ hostvars[groups['app'][0]]['ansible_all_ipv4_addresses'][0] }}"
 dspace_db_ip:               "{{ hostvars[groups['db'][0]]['ansible_all_ipv4_addresses'][0] }}"
-# dspace_db_ip:   "{{ hostvars[groups['db'][0]]['ansible_eth1']['ipv4']['address'] }}"
 
-dspace_address:             "{{ dspace_ip }}"
-dspace_db_address:          "{{ dspace_db_ip }}"
+# data transform queries
 db_transform_queries:       []
 
 # apache vars
@@ -34,6 +16,8 @@ hostname:                   "{{ dspace_name | lower }}"
 domainname:                 "test"
 ssl_self_sign_cert:         true
 ssl_support_legacy_clients: false
+PASS_config:                false
+# dspace_hostname_override:   "dspace-dev.test"
 
 # admin vars
 dspace_admins:              "{{ vault_dspace_admins }}"

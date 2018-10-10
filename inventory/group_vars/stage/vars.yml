@@ -1,30 +1,14 @@
 # setup vars
 environ:                        "stage" # dev || stage || prod
-login_user_passphrase:          "{{ vault_login_user_passphrase }}"
-
-# install vars
-dspace_major_version:       6
-dspace_minor_version:       2
-
-# TODO: move to all (?)
-postgres_version_major:     9
-postgres_version_minor:     6
-postgres_extra_packages:
-  - "postgresql-contrib"
-postgres_extensions:
-  - "pgcrypto"
-
-postgres_upgrade_ok:        true
-postgres_upgrade_cleanup:   true
 
 # assetstore vars
-remote_stores_available:        true
+remote_stores_available:    false
 stores_fstab:
 - name:   "/mnt/dspace/storage"
   src:    "sam.mse.jhu.edu:/apps/dspace_snapshot"
   fstype: "nfs"
   opts:   "rw,tcp,intr,noatime"
-  state:  "mounted"
+  state:  "absent"
 # - name:   "/mnt/dspace/storage"
 #   src:    "/dev/sdc1"
 #   fstype: "xfs"
@@ -41,7 +25,11 @@ dspace_name:                    "JScholarship-{{ environ | title }}"
 ssl_certificate_file:           "{{ vault_ssl_certificate_file }}"
 ssl_certificate_key_file:       "{{ vault_ssl_certificate_key_file }}"
 ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
+PASS_config:                    false
 
 # db vars
 dspace_db_address:              "psql02.{{ domainname }}"
 db_transform_queries:           []
+
+# upgrade vars
+dspace_backup_statistics: false

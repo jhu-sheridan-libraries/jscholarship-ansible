@@ -1,10 +1,10 @@
 # prod:
 # ------------------
 [default]
-dspace-prod.library.jhu.edu
+dspace-prod.mse.jhu.edu
 
 [app]
-dspace-prod.library.jhu.edu
+dspace-prod.mse.jhu.edu
 
 [db]
 psql03.mse.jhu.edu

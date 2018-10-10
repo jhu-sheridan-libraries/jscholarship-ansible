@@ -6,6 +6,7 @@ project:        "jscholarship"
 version:        "1.0.0"
 login_user:     "deploy"
 login_group:    "{{ login_user }}"
+login_user_passphrase:  "{{ vault_login_user_passphrase }}"
 
 # testing vars
 set_up_tests:   true
@@ -15,13 +16,15 @@ app_user:       "dspace"
 
 # install vars
 dspace_major_version: 6
-dspace_minor_version: 2
+dspace_minor_version: 3
 dspace_version:       "{{ dspace_major_version }}.{{ dspace_minor_version }}"
 dspace_install_dir:   "/opt"
 dspace_install:       "{{ dspace_install_dir }}/dspace"
 dspace_user_home:     "/home/{{ app_user }}"
 dspace_source_dir:    "dspace-{{ dspace_version }}"
 dspace_source:        "{{ dspace_user_home }}/{{ dspace_source_dir }}"
+dspace_build_errors:        false
+dspace_build_debugging:     false
 
 postgres_version_major:     9
 postgres_version_minor:     6
@@ -37,8 +40,15 @@ postgres_upgrade_cleanup:   true
 dspace_name:            "JScholarship"
 hostname:               "dspace-{{ environ }}"
 domainname:             "mse.jhu.edu"
+fqdn:                   "{{ hostname }}.{{ domainname }}"
+default_port:           8080
+ajp_port:               8009
 apache_https:           true
 apache_proxy_tomcat:    true
+ssl_certificate_path:           "/etc/pki/tls/certs"
+ssl_certificate_key_path:       "/etc/pki/tls/private"
+ssl_support_legacy_clients:     false
+PASS_config:                    false
 
 # tomcat vars
 catalina_opts:          "-server
@@ -131,6 +141,7 @@ email_disabled:           false
 loglevel_default: "WARN"
 loglevel_dspace:  "{{ loglevel_default }}"
 loglevel_solr:    "{{ loglevel_default }}"
+apache_log_level: "{{ loglevel_default }}"
 loglevel_other:   "{{ loglevel_default }}"
 max_logs:         14
 log_dir:          "{{ dspace_install }}/log"

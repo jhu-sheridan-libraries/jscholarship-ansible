@@ -1,37 +1,24 @@
 # setup vars
 environ:                        "test" # dev || stage || prod
 debugging:                      true
-login_user_passphrase:          "{{ vault_login_user_passphrase }}"
-
-# install vars
-dspace_major_version:       6
-dspace_minor_version:       2
-
-# TODO: move to all (?)
-postgres_version_major:     9
-postgres_version_minor:     6
-postgres_extra_packages:
-  - "postgresql-contrib"
-postgres_extensions:
-  - "pgcrypto"
-
-postgres_upgrade_ok:        true
-postgres_upgrade_cleanup:   true
 
 # assetstore vars
-remote_stores_available:        true
+remote_stores_available:    false
 stores_fstab:
 - name:   "/mnt/dspace/storage"
   src:    "sam.mse.jhu.edu:/apps/dspace_snapshot"
   fstype: "nfs"
   opts:   "rw,tcp,intr,noatime"
-  state:  "mounted"
+  state:  "absent"
 
 # apache vars
 dspace_name:                    "JScholarship-{{ environ | title }}"
 ssl_certificate_file:           "{{ vault_ssl_certificate_file }}"
 ssl_certificate_key_file:       "{{ vault_ssl_certificate_key_file }}"
 ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
+# apache_config_template:         "templates/apache.conf.j2"
+PASS_config:                    false
+# dspace_hostname_override:       "jscholarship-test.mse.jhu.edu"
 
 # db vars
 db_name:                        "dspace-test"
@@ -44,3 +31,7 @@ email_disabled:                 true
 
 # logging vars
 loglevel_dspace:  "INFO"
+
+# upgrade vars
+dspace_backup_statistics: false
+dspace_backup_default_assetstore: false

@@ -18,8 +18,8 @@ db
 shib_sp
 
 # groups to emulate full environment:
-[db_prod:children]
-db
+#[db_prod:children]
+#db
 [db_not_prod:children]
 db
 [app_not_prod:children]
