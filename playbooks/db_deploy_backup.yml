@@ -1,22 +1,10 @@
 ---
-# NOTE: only really works with full_environment inventory or emulation thereof
+# NOTE: requires full_environment inventory or emulation thereof
 
 # NOTE: while it would be easier to synchronize files directly from one server to another,
 # i cannot seem to get the synchronize module to cooperate without asking for a password on the server.
 # so instead, i go through the trouble of bringing the desired file to the control,
 # then pushing it to the desired destination(s)
-- name: fetch backup file from server
-  hosts: db_prod
-
-  vars:
-    backup_file: "{{ copy_backup_file }}"
-
-  tasks:
-    - name: fetch backup file from server
-      fetch:
-        src: "{{ backup_file }}"
-        dest: "../db_backup/"
-        flat: true
 
 - name: stop app servers before restoring database
   hosts: app_not_prod
