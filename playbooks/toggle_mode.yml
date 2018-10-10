@@ -1,0 +1,42 @@
+---
+# NOTE: this is a special-purpose (and hopefully temporary) playbook designed to
+# toggle between the differing configuration sets needed to support integration
+# with PASS and Vireo. the value of "PASS_config" should be the sole determinant
+
+# NOTE: since variables cannot be passed to included playbooks in ansible <2.4
+# this playbook has been adjusted to use PASS_config internally
+- include: dspace_adjust_config.yml
+
+- name: adjust apache configuration
+  hosts: app
+
+  tasks:
+  - name: set vars for compatibility with PASS
+    set_fact:
+      mode: "PASS"
+    when: PASS_config
+
+  - name: set vars for compatibility with Vireo
+    set_fact:
+      mode: "Vireo"
+    when: not PASS_config
+
+  - name: "adjust apache config for compatibility with {{ mode }}"
+    include_role:
+      name: apache
+    vars:
+      # NOTE: this template uses PASS_config internally
+      apache_config_template: "templates/apache.conf.j2"
+
+  - name: configs updated
+    debug:
+      msg: "configuration updated for compatibility with {{ mode }}"
+
+  - name: fetch adjusted configs
+    fetch:
+      src: "{{ item }}"
+      dest: "_reference/{{ item | basename | splitext | first }}_{{ environ }}_{{ mode }}{{ item | basename | splitext | last }}"
+      flat: true
+    with_items:
+    - "/opt/dspace/config/local.cfg"
+    - "/etc/httpd/conf.d/01_{{ hostname }}.conf"

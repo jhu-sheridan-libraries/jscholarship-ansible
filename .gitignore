@@ -14,6 +14,7 @@ roles/*
 !roles/local.*
 playbooks/templates/shibconfigs*
 playbooks/test_*
+playbooks/_reference
 
 # db_backup
 db_backup/*
