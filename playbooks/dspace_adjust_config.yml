@@ -196,7 +196,33 @@
     # end block - imagemagick
 
   # SWORD v2
-  - name: adjust SWORD v2 configuration
+  - name: set hostname var appropriately
+    set_fact:
+      config_hostname: "{{ hostname }}.{{ domainname }}"
+  - set_fact:
+      config_hostname: "{{ dspace_hostname_override }}"
+    when: dspace_hostname_override is defined
+
+  # for PASS, adjust to this:
+  # swordv2-server.url = http://dspace-prod.mse.jhu.edu:8080/swordv2
+  # swordv2-server.collection.url = https://jscholarship.library.jhu.edu/swordv2/collection
+  # swordv2-server.servicedocument.url = http://dspace-prod.mse.jhu.edu:8080/swordv2/servicedocument
+  # swordv2-server.on-behalf-of.enable = true
+  # swordv2-server.verbose-description.receipt.enable = true
+  - name: adjust SWORD v2 configuration - PASS
+    blockinfile:
+      dest: "{{ dspace_config }}"
+      block: |
+        swordv2-server.url = http://{{ fqdn }}:{{ default_port }}/swordv2
+        swordv2-server.collection.url = https://{{ config_hostname }}/swordv2/collection
+        swordv2-server.servicedocument.url = http://{{ fqdn }}:{{ default_port }}/swordv2/servicedocument
+        swordv2-server.on-behalf-of.enable = true
+        swordv2-server.verbose-description.receipt.enable = true
+      marker: "# {mark} SWORD v2 server configuration"
+    notify: update configs
+    when: dspace_major_version == 6 and PASS_config
+
+  - name: adjust SWORD v2 configuration - Vireo
     blockinfile:
       dest: "{{ dspace_config }}"
       block: |
@@ -204,8 +230,7 @@
         swordv2-server.verbose-description.receipt.enable = true
       marker: "# {mark} SWORD v2 server configuration"
     notify: update configs
-    when: dspace_major_version == 6
-  # end block - SWORD v2
+    when: dspace_major_version == 6 and not PASS_config
 
   # customize list views
   - name: add thumbs to list views
@@ -262,3 +287,45 @@
           state: absent
         notify: update configs
     when: dspace_hostname_override is not defined
+
+  - name: adjust baseUrl - PASS
+    lineinfile:
+      dest: "{{ dspace_config }}"
+      regexp: "^dspace.baseUrl"
+      line: "dspace.baseUrl = http://{{ fqdn }}:{{ default_port }}"
+    notify: update configs
+    when: PASS_config
+
+  - name: adjust baseUrl - Vireo
+    lineinfile:
+      dest: "{{ dspace_config }}"
+      regexp: "^dspace.baseUrl"
+      line: "dspace.baseUrl = https://{{ fqdn }}"
+    notify: update configs
+    when: not PASS_config
+
+  - name: toggle REST API security constraint
+    block:
+    - set_fact:
+        comment_presence: "absent"
+    - set_fact:
+        comment_presence: "present"
+      when: PASS_config
+
+    - name: add or remove opening comment tag
+      lineinfile:
+        path: "{{ dspace_install }}/webapps/rest/WEB-INF/web.xml"
+        regexp: '^<!-- disable security constraint'
+        insertbefore: '<security-constraint>'
+        line: '<!-- disable security constraint'
+        state: "{{ comment_presence }}"
+
+    - name: add or remove closing comment tag
+      lineinfile:
+        path: "{{ dspace_install }}/webapps/rest/WEB-INF/web.xml"
+        regexp: '^disable security constraint -->'
+        insertafter: '</security-constraint>'
+        line: 'disable security constraint -->'
+        state: "{{ comment_presence }}"
+
+    # end block - toggle REST API security constraint
