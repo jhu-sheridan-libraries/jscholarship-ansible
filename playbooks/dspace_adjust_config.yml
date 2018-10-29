@@ -98,6 +98,12 @@
         line: "assetstore.dir.1 = /mnt/dspace/storage/assetstore1"
       notify: update configs
 
+    - name: configure additional assetstore in bitstore
+      template:
+        src: "templates/bitstore.xml.j2"
+        dest: "{{ dspace_config_dir }}/spring/api/bitstore.xml"
+      notify: update configs
+
   # embargo settings
   - block:
     - name: configure embargo terms
