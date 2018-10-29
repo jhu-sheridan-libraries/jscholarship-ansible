@@ -24,4 +24,3 @@ dspace_db_address:              "psql03.mse.jhu.edu"
 
 # config vars
 dspace_hostname_override:       "jscholarship.library.jhu.edu"
-dspace_mail_admin:              "dreynolds@jhu.edu"

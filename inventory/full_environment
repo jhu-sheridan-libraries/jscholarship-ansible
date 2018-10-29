@@ -44,7 +44,7 @@ db_stage
 # prod:
 # ------------------
 [app_prod]
-dspace-prod.library.jhu.edu
+dspace-prod.mse.jhu.edu
 
 [db_prod]
 psql03.mse.jhu.edu
