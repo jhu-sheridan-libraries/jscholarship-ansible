@@ -250,19 +250,30 @@
   # end block - customize list views
 
   - name: dis/enable email
-    blockinfile:
+    block:
+    - set_fact:
+        disabled_state: "absent"
+    - set_fact:
+        disabled_state: "present"
+      when: email_disabled
+
+    - name: add or remove disabling block
+      blockinfile:
+        dest: "{{ dspace_config }}"
+        block: |
+          # NOTE: loglevel must be set to INFO or above for disabled email to be logged
+          # changes to loglevel (unlike this setting) require tomcat restart
+          mail.server.disabled = {{ email_disabled }}
+        marker: "# {mark} disable email"
+        state: "{{ disabled_state }}"
+      notify: update configs
+
   - name: mail admin
     lineinfile:
       dest: "{{ dspace_config }}"
-      block: |
-        # NOTE: loglevel must be set to INFO or above for disabled email to be logged
-        # changes to loglevel (unlike this setting) require tomcat restart
-        mail.server.disabled = {{ email_disabled }}
-      marker: "# {mark} disable email"
       regexp: "^mail.admin"
       line: "mail.admin = {{ dspace_mail_admin }}"
     notify: update configs
-    when: email_disabled
 
   - name: hostname override
     block:
