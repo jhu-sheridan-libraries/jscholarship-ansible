@@ -17,7 +17,7 @@ ssl_certificate_chain_file:     "{{ vault_ssl_certificate_chain_file }}"
 # hostname:                       "jscholarship"
 # domainname:                     "library.jhu.edu"
 PASS_config:                    true
-ssl_support_legacy_clients:     true
+ssl_support_legacy_clients:     false
 
 # db vars
 dspace_db_address:              "psql03.mse.jhu.edu"
