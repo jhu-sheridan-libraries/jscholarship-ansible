@@ -33,3 +33,7 @@ db_transform_queries:           []
 
 # upgrade vars
 dspace_backup_statistics: false
+
+# temporary debugging values
+loglevel_dspace:  "INFO" # DEBUG, INFO, WARN, ERROR, FATAL
+email_disabled:   true
