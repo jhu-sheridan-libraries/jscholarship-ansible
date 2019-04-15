@@ -23,4 +23,6 @@ ssl_support_legacy_clients:     true
 dspace_db_address:              "psql03.mse.jhu.edu"
 
 # config vars
+# NOTE: comment dspace_hostname_override out if PASS_config is false
 dspace_hostname_override:       "jscholarship.library.jhu.edu"
+dspace_mail_admin:              "jscholarship-help@jhu.edu"

@@ -251,12 +251,16 @@
 
   - name: dis/enable email
     blockinfile:
+  - name: mail admin
+    lineinfile:
       dest: "{{ dspace_config }}"
       block: |
         # NOTE: loglevel must be set to INFO or above for disabled email to be logged
         # changes to loglevel (unlike this setting) require tomcat restart
         mail.server.disabled = {{ email_disabled }}
       marker: "# {mark} disable email"
+      regexp: "^mail.admin"
+      line: "mail.admin = {{ dspace_mail_admin }}"
     notify: update configs
     when: email_disabled
 
