@@ -257,7 +257,7 @@
         disabled_state: "present"
       when: email_disabled
 
-    - name: add or remove disabling block
+    - name: add or remove email disabling block
       blockinfile:
         dest: "{{ dspace_config }}"
         block: |
@@ -350,3 +350,30 @@
         state: "{{ comment_presence }}"
 
     # end block - toggle REST API security constraint
+
+  - name: item requests
+    block:
+    - set_fact:
+        reject_response_state: "absent"
+        response_body: ""
+    - set_fact:
+        reject_response_state: "present"
+        response_body: "{{ itemRequest_response_body_reject }}"
+      when: itemRequest_response_body_reject is defined
+
+    - name: add or remove reject response
+      blockinfile:
+        dest: "{{ dspace_config }}"
+        block: itemRequest.response.body.reject = {{ response_body }}
+        marker: "# {mark} reject response"
+        state: "{{ reject_response_state }}"
+      notify: update configs
+
+    - name: set request item type
+      lineinfile:
+        dest: "{{ dspace_config }}"
+        regexp: "^request.item.type"
+        line: "request.item.type = {{ request_item_type }}"
+      notify: update configs
+      when: request_item_type is defined
+  # end block - item requests

@@ -185,3 +185,7 @@ shib_idp_metadata:
   src: "templates/vault-idpjhedu-metadata.xml"
 - filename: "ITatJH-prod-idp-metadata.xml"
   src: "templates/vault-ITatJH-prod-idp-metadata.xml"
+
+# request item vars
+# https://wiki.duraspace.org/display/DSDOC6x/Request+a+Copy#RequestaCopy-Configurationparameters
+request_item_type: '' # empty, all, or logged
