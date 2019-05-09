@@ -336,10 +336,11 @@
     - name: add or remove opening comment tag
       lineinfile:
         path: "{{ dspace_install }}/webapps/rest/WEB-INF/web.xml"
-        regexp: '^<!-- disable security constraint'
+        regexp: '^<\\!-- disable security constraint'
         insertbefore: '<security-constraint>'
         line: '<!-- disable security constraint'
         state: "{{ comment_presence }}"
+      notify: restart tomcat
 
     - name: add or remove closing comment tag
       lineinfile:
@@ -348,6 +349,7 @@
         insertafter: '</security-constraint>'
         line: 'disable security constraint -->'
         state: "{{ comment_presence }}"
+      notify: restart tomcat
 
     # end block - toggle REST API security constraint
 
