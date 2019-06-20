@@ -2,6 +2,11 @@
 environ:                "dev" # dev || stage || prod
 debugging:              true
 
+# SSH vars
+login_group:            "{{ lookup('ini', 'login_group section=dev file=~/.ansible.ini default=' + login_user ) }}"
+login_password:         "{{ lookup('ini', 'login_password section=dev file=~/.ansible.ini') }}"
+login_user_grant_sudo:  true
+
 # db vars
 dspace_ip:                  "{{ hostvars[groups['app'][0]]['ansible_all_ipv4_addresses'][0] }}"
 dspace_db_ip:               "{{ hostvars[groups['db'][0]]['ansible_all_ipv4_addresses'][0] }}"
@@ -26,3 +31,6 @@ dspace_admins:              "{{ vault_dspace_admins }}"
 
 # upgrade vars
 dspace_backup_default_assetstore: true
+
+# testing vars
+set_up_tests:   false
