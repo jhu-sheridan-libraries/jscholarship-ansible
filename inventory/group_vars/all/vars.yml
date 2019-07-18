@@ -9,6 +9,7 @@ version:        "1.0.0"
 use_master_user:        true
 remote_user:            "{{ lookup('ini', 'remote_user section=cross-project file=~/.ansible.ini') }}"
 login_user:             "{{ lookup('ini', 'login_user section=cross-project file=~/.ansible.ini') }}"
+login_group:            "{{ lookup('ini', 'login_group section=cross-project file=~/.ansible.ini') }}"
 login_user_key:         "jhu_ssh_key"
 create_login_user_key:  false
 login_user_grant_sudo:  false
