@@ -20,7 +20,7 @@ ssh_settings:
   setting: "DenyUsers deploy"
 
 # testing vars
-set_up_tests:   true
+set_up_tests:   false
 
 # application user vars - dspace user and tomcat user
 app_user:       "dspace"
