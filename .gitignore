@@ -26,3 +26,5 @@ Gemfile.lock
 .bundle/
 vendor/
 # END testup
+
+.idea/

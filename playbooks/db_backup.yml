@@ -4,6 +4,11 @@
   hosts: db_prod
 
   tasks:
+
+  - name: debug db settings
+    debug:
+      msg: DB {{ db_name }} DB USER {{ db_user }} DB PASS {{ db_password }} ADDRESS {{ dspace_db_ip }}
+
   - name: install ansible postgres prereqs
     include_role:
       name: postgres

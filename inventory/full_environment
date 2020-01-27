@@ -7,15 +7,15 @@
 
 # dev:
 # ------------------
-[app_dev]
-jscholarship.test
+# [app_dev]
+# jscholarship.test
 
-[db_dev]
-jscholarship-db.test
+# [db_dev]
+# jscholarship-db.test
 
-[dev:children]
-app_dev
-db_dev
+# [dev:children]
+# app_dev
+# db_dev
 
 # test:
 # ------------------
@@ -62,17 +62,17 @@ db_prod
 #app_prod
 
 [app_not_prod:children]
-app_dev
+# app_dev
 #app_test
-#app_stage
+app_stage
 
 [db_servers:children]
 #db_dev
 #db_test
-#db_stage
+db_stage
 #db_prod
 
 [db_not_prod:children]
-db_dev
+#db_dev
 #db_test
-#db_stage
+db_stage
