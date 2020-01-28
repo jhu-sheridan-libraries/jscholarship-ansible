@@ -1,0 +1,16 @@
+---
+- name: instal EPEL repo
+  yum:
+    name: "epel-release"
+    state: present
+    disable_plugin: "rhnplugin"
+  become: true
+
+# TODO: review
+- name: install prereqs for ansible control of postgres
+  yum:
+    name: ['postgresql-libs', 'python-psycopg2']
+    state: present
+    enablerepo: epel
+    disable_plugin: "rhnplugin"
+  become: true

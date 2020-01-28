@@ -1,0 +1,25 @@
+---
+- name: add dspace user group
+  group:
+    name:     "{{ dspace_group }}"
+    gid:      "{{ dspace_group_gid | default(omit) }}"
+    state:    present
+
+- name: add dspace user
+  user:
+    name:     "{{ dspace_user }}"
+    shell:    "/bin/bash"
+    uid:      "{{ dspace_user_uid  | default(omit) }}"
+    group:    "{{ dspace_group }}"
+    comment:  "{{ dspace_user }} system account"
+
+- name: add pgpass entry for dspace database
+  include: tasks/pgpass.yml
+  vars:
+    admin_user:   "{{ dspace_user }}"
+    admin_group:  "{{ dspace_group }}"
+    host:         "{{ dspace_db_address }}"
+    database:     "{{ dspace_db_name }}"
+    user:         "{{ dspace_db_user }}"
+    password:     "{{ dspace_db_pass }}"
+    state:        present

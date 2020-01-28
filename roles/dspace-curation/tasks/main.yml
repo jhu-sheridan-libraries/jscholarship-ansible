@@ -1,0 +1,12 @@
+---
+- name: build tasks
+  include: build.yml
+
+- name: deploy tasks
+  include: deployment.yml
+
+- name: configure tasks
+  include: configuration.yml
+
+- name: log tasks
+  include: logging.yml

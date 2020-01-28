@@ -1,0 +1,13 @@
+<?xml version='1.0'?>
+<Context
+  docBase="{{ dspace_install }}/webapps/{{ item.name }}"
+{% if item.default_webapp | default(false) %}
+  useRelativeRedirects="false"
+{% endif %}
+  reloadable="{{ dspace_context_reloadable }}" >
+  <Resources cachingAllowed="{{ dspace_context_caching_allowed }}" />
+{% if item.address_restriction | default(false) %}
+  <Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="{{ dspace_ip_whitelist | join('|') }}"/>
+  <Parameter name="LocalHostRestrictionFilter.localhost" value="false" override="false" />
+{% endif %}
+</Context>

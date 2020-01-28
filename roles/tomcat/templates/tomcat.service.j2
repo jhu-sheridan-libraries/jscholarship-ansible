@@ -1,0 +1,19 @@
+# Systemd unit file for tomcat
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=syslog.target network.target
+[Service]
+Type=forking
+User={{ tomcat_user }}
+Group={{ tomcat_user }}
+Environment=TOMCAT_USER={{ tomcat_user }}
+Environment=JAVA_HOME={{ java_home }}
+Environment='JAVA_OPTS={{ java_opts }}'
+Environment=CATALINA_HOME={{ catalina_home }}
+Environment='CATALINA_OPTS={{ catalina_opts }}'
+Environment=CATALINA_PID={{ catalina_home }}/temp/tomcat.pid
+PIDFile={{ catalina_home }}/temp/tomcat.pid
+ExecStart={{ catalina_home }}/bin/startup.sh
+ExecStop=
+[Install]
+WantedBy=multi-user.target

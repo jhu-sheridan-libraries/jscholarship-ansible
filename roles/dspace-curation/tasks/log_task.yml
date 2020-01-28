@@ -1,0 +1,16 @@
+---
+- name: translate logging boolean into state
+  set_fact:
+    log_state: "present"
+- set_fact:
+    log_state: "absent"
+  when: not logging
+
+- name: configure logging for task
+  blockinfile:
+    dest: "{{ dspace_install }}/config/log4j.properties"
+    insertafter: 'EOF'
+    block: "{{ lookup('template', log_template) }}"
+    marker: "# {mark} {{ shortname }} curation task logging"
+    state: "{{ log_state }}"
+  notify: restart tomcat

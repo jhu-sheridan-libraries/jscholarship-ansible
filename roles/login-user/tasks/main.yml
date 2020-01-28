@@ -1,0 +1,6 @@
+---
+- include_tasks: 'deploy_user.yml'
+  when: not use_master_user
+
+- include_tasks: 'master_user.yml'
+  when: use_master_user

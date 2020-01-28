@@ -1,0 +1,11 @@
+- name: log task
+  include: log_task.yml
+  become: true
+  become_user: "{{ dspace_user }}"
+  vars:
+    shortname:    "{{ item.shortname }}"
+    package:      "{{ item.package }}"
+    logging:      "{{ item.logging | default(false) }}"
+    loglevel:     "{{ item.loglevel | default(dspace_curation_loglevel) }}"
+    log_template: "{{ item.log_template | default(dspace_curation_log_template) }}"
+  with_items:     "{{ dspace_curation_tasks }}"

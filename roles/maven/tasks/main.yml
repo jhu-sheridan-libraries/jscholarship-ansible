@@ -1,0 +1,69 @@
+---
+- name: get java version
+  shell:   "java -version 2>&1"
+  register: java_version_result
+  changed_when: false
+
+# NOTE: regex_search() returns an array of matches, so we will need to use the 'first' filter to make use of the first (and only) value
+- set_fact: returned_java_version={{ java_version_result.stdout | regex_replace('^$','0.0.0') | regex_search('(?P<test>\d+\.\d+.\d+)', '\\g<test>' ) | first }}
+
+- name: test java version
+  fail:
+    msg: "this installation of maven requires java version {{ maven_minimum_java_version }} or higher"
+  when: "not returned_java_version | version_compare(maven_minimum_java_version, '>=')"
+
+- name: get maven checksum
+  set_fact:
+    maven_checksum: "{{ maven_checksum_algo }}:{{ item }}"
+  with_url: "{{ maven_checksum_url }}"
+
+- name: get maven
+  get_url:
+    url:      "{{ maven_url }}"
+    dest:     "{{ maven_download_dir }}"
+    checksum: "{{ maven_checksum }}"
+  register: got_maven
+
+- name: extract maven
+  unarchive:
+    src:        "{{ maven_download_dir }}/{{ maven_download_file }}"
+    dest:       "{{ maven_install_dir }}"
+    remote_src: yes
+  become: true
+
+- name: symlink maven
+  file:
+    src:    "{{ maven_install_dir }}/{{ maven_dir }}"
+    dest:   "{{ maven_install_dir }}/maven"
+    state:  link
+  become: true
+
+- name: set maven home environment var
+  lineinfile:
+    dest:   "/etc/profile.d/maven.sh"
+    line:   "export MAVEN_HOME={{ maven_install_dir }}/maven"
+    state:  present
+    create: yes
+  become: true
+
+- name: put maven on the path
+  lineinfile:
+    dest:   "/etc/profile.d/maven.sh"
+    line:   "export PATH=$MAVEN_HOME/bin:$PATH"
+    state:  present
+    create: yes
+  become: true
+
+- name: get maven version
+  shell: "bash -lc 'mvn --version'"
+  register: maven_version_result
+  changed_when: false
+  become: false
+
+# NOTE: regex_search() returns an array of matches, so we will need to use the 'first' filter to make use of the first (and only) value
+- set_fact: returned_maven_version={{ maven_version_result.stdout | regex_replace('^$','0.0.0') | regex_search('(?P<test>\d+\.\d+.\d+)', '\\g<test>' ) | first }}
+
+- name: test maven version
+  fail:
+    msg: "attempted to install maven {{ maven_version }}, but something went wrong"
+  when: "not returned_maven_version | version_compare(maven_version, '==')"

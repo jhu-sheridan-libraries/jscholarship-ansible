@@ -1,0 +1,14 @@
+---
+- name: stop tomcat
+  command: "echo 'stopping tomcat to install dspace'"
+  changed_when: true
+  notify: stop tomcat
+
+- meta: flush_handlers
+
+- name: install dspace
+  become: true
+  become_user: "{{ dspace_user }}"
+  shell: "source /etc/profile && ant fresh_install"
+  args:
+    chdir: "{{ dspace_source }}/dspace/target/dspace-installer"

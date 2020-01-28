@@ -9,9 +9,9 @@
 .ropeproject
 
 # local
-roles/*
-!roles/README.md
-!roles/local.*
+# roles/*
+# !roles/README.md
+# !roles/local.*
 playbooks/templates/shibconfigs*
 playbooks/test_*
 playbooks/_reference

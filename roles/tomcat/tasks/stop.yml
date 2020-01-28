@@ -1,0 +1,4 @@
+---
+- debug: msg="trigger tomcat stop"
+  notify: stop tomcat
+  changed_when: true

@@ -1,0 +1,38 @@
+---
+# NOTE: it is recommended that the playbook responsible for upgrading DSpace
+# use its database role to back up the database when it runs these pre-upgrade
+# tasks.
+
+- name: create backup directory
+  file:
+    path: "{{ dspace_backup_dir }}"
+    owner: "{{ dspace_user }}"
+    group: "{{ dspace_group }}"
+    state: directory
+  become: true
+
+# NOTE: set dspace_backup_default_assetstore to false and backup with containing playbook,
+# if using alternate assetstores or locations
+- name: backup default assetstore
+  archive:
+    path: "{{ dspace_install }}/assetstore"
+    dest: "{{ dspace_backup_dir }}/assetstore.tar.gz"
+  become: true
+  become_user: "{{ dspace_user }}"
+  when: dspace_backup_default_assetstore
+
+- name: backup configuration
+  archive:
+    path: "{{ dspace_install }}/config"
+    dest: "{{ dspace_backup_dir }}/config.tar.gz"
+  become: true
+  become_user: "{{ dspace_user }}"
+  when: dspace_backup_configuration
+
+- name: backup statistics
+  archive:
+    path: "{{ dspace_install }}/solr/statistics"
+    dest: "{{ dspace_backup_dir }}/statistics.tar.gz"
+  become: true
+  become_user: "{{ dspace_user }}"
+  when: dspace_backup_statistics

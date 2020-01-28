@@ -1,0 +1,2 @@
+---
+apache_fqdn:        "{{ apache_hostname }}.{{ apache_domainname }}"

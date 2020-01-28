@@ -1,0 +1,143 @@
+---
+- name: include os-specific vars
+  include_vars: "{{ansible_os_family}}.yml"
+
+- name: test variables
+  debug:
+    msg: "apache_fqdn: {{ apache_fqdn }}"
+
+- name: install apache packages
+  package: name={{ item }} state=present
+  become: true
+  with_items:
+    - "{{ apache_service }}"
+
+- name: install packages to support https
+  package: name={{ item }} state=present
+  become: true
+  with_items:
+    - mod_ssl
+    - openssl
+  when: apache_https
+
+- name: prevent mutually-exclusive settings
+  assert:
+    that:
+      - not (ssl_self_sign_cert and ssl_provided_cert)
+    msg: "ssl_self_sign_cert and ssl_provided_cert are mutually exclusive"
+
+  # begin self-signed block
+- block:
+  - name: create self-signed SSL cert
+    command: >
+      openssl req -new -nodes -x509
+      -subj "{{ ssl_certificate_subj }}"
+      -days 365
+      -newkey rsa:4096
+      -keyout "{{ ssl_certificate_key_path }}/{{ ssl_certificate_key_file }}"
+      -out "{{ ssl_certificate_path}}/{{ ssl_certificate_file }}"
+      creates="{{ ssl_certificate_path}}/{{ ssl_certificate_file }}"
+    register: key
+
+  - name: generate DH parameters for perfect forward secrecy
+    command: >
+      openssl dhparam
+      -out "{{ ssl_certificate_path}}/dhparam.pem"
+      2048
+      creates="{{ ssl_certificate_path}}/dhparam.pem"
+    register: params
+
+  - wait_for:
+      path: "{{ ssl_certificate_path}}/dhparam.pem"
+
+  - name: load parameters into a variable, to use in the next task
+    shell: "cat {{ ssl_certificate_path}}/dhparam.pem"
+    register: param_contents
+    when: key.changed or params.changed
+
+    # NOTE: going to the trouble to remove header and footer, so we can use them as markers for the block
+  - name: append parameters to the certificate
+    blockinfile:
+      block: "{{ param_contents.stdout | replace('-----BEGIN DH PARAMETERS-----\n', '') | replace('\n-----END DH PARAMETERS-----', '') }}"
+      dest: "{{ ssl_certificate_path}}/{{ ssl_certificate_file }}"
+      marker: "-----{mark} DH PARAMETERS-----"
+    when: key.changed or params.changed
+
+  # end self-signed block
+  become: true
+  when: "{{ ssl_self_sign_cert }}"
+
+  # begin provided cert block
+- block:
+  - name: create ssl cert
+    copy :
+      content: "{{ ssl_certificate_content }}"
+      dest :  "{{ ssl_certificate_path }}/{{ ssl_certificate_file }}"
+      mode :  "u=r,g=r,o=r"
+    when:  ssl_certificate_content != ""
+
+  - name: create ssl key
+    copy :
+      content: "{{ ssl_certificate_key_content }}"
+      dest :  "{{ ssl_certificate_key_path }}/{{ ssl_certificate_key_file }}"
+      mode :  "u=r,g=,o="
+    when:  ssl_certificate_key_content  != ""
+
+  - name: create ssl chain
+    copy :
+      content: "{{ ssl_certificate_chain_content }}"
+      dest :  "{{ ssl_certificate_path }}/{{ ssl_certificate_chain_file }}"
+      mode :  "u=r,g=r,o=r"
+    when:  ssl_certificate_chain_content != ""
+
+  no_log: "{{ not apache_debugging }}"
+  become: true
+  when: "{{ ssl_provided_cert }}"
+  # end provided cert block
+
+- name: remove welcome (test) page
+  file:
+    dest: "/etc/{{ apache_service }}/conf.d/welcome.conf"
+    state: absent
+  become: true
+  notify: restart apache
+  when: apache_remove_welcome
+
+- name: determine which config template to use
+  block:
+  - name: use template from the calling playbook
+    set_fact:
+      config_template: "{{ apache_config_template }}"
+    when: apache_config_template != ""
+  - name: use legacy template
+    set_fact:
+      config_template: "legacy.conf.j2"
+    when: apache_config_template == "" and apache_legacy_configuration
+  - name: use default template
+    set_fact:
+      config_template: "default.conf.j2"
+    when: apache_config_template == "" and not apache_legacy_configuration
+  # end config template block
+
+- name: configure apache
+  template:
+    src: "{{ config_template }}"
+    dest: "{{ apache_config_file }}"
+  become: true
+  notify: restart apache
+
+- name: turn off SSL compression for version < 2.4.3
+  blockinfile:
+    block: "export OPENSSL_NO_DEFAULT_ZLIB=1"
+    dest: "/etc/sysconfig/httpd"
+    marker: "# {mark} disable ssl compression for apache < 2.4.3"
+  become: true
+  notify: restart apache
+  when: apache_legacy_configuration
+
+- name: check if apache service is running
+  service:
+    name: "{{ apache_service }}"
+    state: started
+  become: true
+  register: apache_status

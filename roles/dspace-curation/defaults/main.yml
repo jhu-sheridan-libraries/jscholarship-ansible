@@ -1,0 +1,40 @@
+---
+dspace_major_version:         5
+# user vars
+dspace_user:                  "{{ app_user      | default('dspace') }}"
+dspace_group:                 "{{ app_group     | default(dspace_user) }}"
+dspace_user_uid:              "{{ app_user_uid  | default(omit) }}"
+dspace_group_gid:             "{{ app_group_gid | default(omit) }}"
+
+# dspace deployment vars
+dspace_install_dir:           "/opt"
+dspace_install:               "{{ dspace_install_dir }}/dspace"
+dspace_user_home:             "/home/{{ dspace_user }}"
+dspace_lib:                   "{{ dspace_install }}/lib"
+dspace_xmlui_lib:             "{{ dspace_install }}/webapps/xmlui/WEB-INF/lib"
+dspace_log_dir:               "{{ dspace_install }}/log"
+
+# logging vars
+dspace_curation_loglevel:     "{{ loglevel_default | default('ERROR') }}"
+# NOTE: override this var to override the log template for *all* curation tasks
+dspace_curation_log_template: "log4j-default.properties.j2"
+
+# TODO: generalize
+# curation vars
+dspace_curation_cfg_template: "curate.cfg.lessthan6.j2"
+dspace_curation_source_dir:   "ctask"
+dspace_curation_source:       "{{ dspace_user_home }}/{{ dspace_curation_source_dir }}"
+dspace_curation_repo:         "https://github.com/dheles/ctask.git"
+dspace_curation_branch:       "fixity"
+dspace_curation_module:       "fixity"
+dspace_curation_tasks:
+  - shortname:                "fixity"
+    ui_taskname:              "Check Fixity"
+    package:                  "org.dspace.ctask.fixity"
+    classname:                "CheckFixity"
+    bundle:                   "fixity-1.0-SNAPSHOT.jar"
+    state:                    "present"
+    logging:                  true
+    loglevel:                 "ERROR"
+    # NOTE: set this var to override the log template for *this* curation task
+    # log_template:           "templates/log4j-curation.properties.j2"

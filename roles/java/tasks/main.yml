@@ -1,0 +1,21 @@
+---
+- name: include os-specific vars
+  include_vars: "{{ansible_os_family}}.yml"
+
+- name: install Java via os-specific OpenJDK package
+  include: "openJDK-{{ansible_os_family}}.yml"
+
+ # TODO: test other OSes
+- name: set java environment var
+  blockinfile:
+    dest:   "/etc/profile.d/java.sh"
+    marker: "# {mark} java home"
+    block:   |
+      # make JAVA_HOME beholden to alternatives
+      export JAVA_HOME=$( j=$( readlink -f /usr/bin/java ) ; echo ${j%%/bin/java} )
+    state:  present
+    create: yes
+
+- name: check java home
+  shell: "bash -lc 'echo $JAVA_HOME'"
+  changed_when: false

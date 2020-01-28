@@ -1,0 +1,68 @@
+---
+- name: insert apache config to protect endpoint
+  no_log: "{{ not shib_debugging }}"
+  blockinfile:
+    block: "{{ lookup('template', shib_virtualhost_template) }}"
+    dest: "{{ apache_config_file }}"
+    marker: "# {mark} shib configs"
+    insertbefore: "</VirtualHost>"
+  notify: restart apache
+
+- name : create sp-cert from vault
+  no_log: "{{ not shib_debugging }}"
+  copy :
+    content: "{{ shib_sp_cert }}"
+    dest : "{{ shib_config_dir }}/sp-cert.pem"
+    mode  : 0640
+    owner : "{{ shib_user }}"
+    group : "{{ shib_group }}"
+    backup: "{{ shib_backup_configs }}"
+  when: shib_sp_cert is defined
+  notify: restart shibd
+
+- name : create sp-key from vault
+  no_log: "{{ not shib_debugging }}"
+  copy :
+    content: "{{ shib_sp_key }}"
+    dest : "{{ shib_config_dir }}/sp-key.pem"
+    mode  : 0600
+    owner : "{{ shib_user }}"
+    group : "{{ shib_group }}"
+    backup: "{{ shib_backup_configs }}"
+  when: shib_sp_key is defined
+  notify: restart shibd
+
+- name : create idp-metadata from vault
+  no_log: "{{ not shib_debugging }}"
+  copy :
+    content: "{{ item.content | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    dest : "{{ shib_config_dir }}/{{ item.filename }}"
+    mode  : "u=rw,g=r,o=r"
+    owner:  "root"
+    group:  "shibd"
+    backup: "{{ shib_backup_configs }}"
+  notify: restart shibd
+  with_items: "{{ shib_idp_metadata }}"
+
+- name : config attributes from template
+  no_log: "{{ not shib_debugging }}"
+  template :
+    src  : "{{ shib_attribute_template }}"
+    dest : "{{ shib_config_dir }}/attribute-map.xml"
+    mode  : "u=rw,g=r,o=r"
+    owner:  "root"
+    group:  "shibd"
+    backup: "{{ shib_backup_configs }}"
+  notify: restart shibd
+
+- name : config shib from template
+  no_log: "{{ not shib_debugging }}"
+  template :
+    src  : "{{ shib_config_template }}"
+    dest : "{{ shib_config_dir }}/shibboleth2.xml"
+    mode  : "u=rw,g=r,o=r"
+    owner:  "root"
+    group:  "shibd"
+    backup: "{{ shib_backup_configs }}"
+  notify: restart shibd

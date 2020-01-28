@@ -1,0 +1,29 @@
+---
+psiprobe_repo:    "https://github.com/psi-probe/psi-probe"
+psiprobe_version: "master"
+psiprobe_release: "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.RC1/probe.war"
+psiprobe_checksum:  "043040cb629d96ce0471e274c9b0cee17b57e56f"
+psiprobe_checksum_algorithm: "sha1"
+psiprobe_download_dir:    "{{ ansible_env.HOME}}"
+catalina_home: "/usr/local/tomcat"
+catalina_opts:          "-server
+                        -Xms256m
+                        -Xmx512m
+                        -XX:+UseParallelGC
+                        -Dcom.sun.management.jmxremote=true"
+tomcat_manager_access:  true
+tomcat_roles:
+  - "probeuser"
+  - "poweruser"
+  - "poweruserplus"
+  - "manager-gui"
+tomcat_users:
+  - username: "admin"
+    password: "changeme"
+    roles:    "manager-gui"
+  - username: "pleb"
+    password: "changeme2"
+    roles:    "probeuser"
+  - username: "double-agent"
+    password: "changeme3"
+    roles:    "probeuser,poweruserplus"

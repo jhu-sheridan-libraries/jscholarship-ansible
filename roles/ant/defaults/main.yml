@@ -1,0 +1,14 @@
+---
+# TODO: test
+ant_minimum_java_version: 1.7
+ant_major_version:        1
+ant_minor_version:        10
+ant_patch_version:        1
+ant_version:              "{{ ant_major_version }}.{{ ant_minor_version }}.{{ ant_patch_version }}"
+ant_install_dir:          "/usr/local"
+ant_download_dir:         "{{ ansible_env.HOME}}"
+ant_dir:                  "apache-ant-{{ ant_version }}"
+ant_download_file:        "{{ ant_dir }}-bin.tar.gz"
+ant_url:                  "https://archive.apache.org/dist/ant//binaries/{{ ant_download_file }}"
+ant_checksum_algo:        "sha512"
+ant_checksum_url:         "{{ ant_url }}.{{ ant_checksum_algo }}"

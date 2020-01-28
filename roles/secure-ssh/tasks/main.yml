@@ -1,0 +1,19 @@
+---
+# tasks file for secure-ssh
+
+- name: include os-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+# TODO: parameterize to provide options
+# TODO: consider using a template instead
+- name: update SSH configuration
+  lineinfile:
+    dest: "{{ ssh_config }}"
+    regexp: "{{ item.regexp }}"
+    line:   "{{ item.setting }}"
+    state: present
+    backrefs: "{{ item.backrefs | default(false) }}"
+    backup: true
+    validate: "sshd -t -f %s"
+  with_items: '{{ ssh_settings }}'
+  notify: restart ssh

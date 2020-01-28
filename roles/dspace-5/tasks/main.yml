@@ -1,0 +1,18 @@
+---
+- include: dspace_user.yml
+  tags: ['user']
+  become: true
+- include: mirage_prereqs.yml
+  tags: ['prereqs']
+  become: true
+  when: dspace_use_alt_theme
+- include: build_dspace.yml
+  tags: ['build']
+  become: true
+- include: install_dspace.yml
+  tags: ['install']
+- include: deploy_dspace.yml
+  tags: ['deploy']
+  become: true
+- include: create_administrator.yml
+  tags: ['init']

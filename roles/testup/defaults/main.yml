@@ -1,0 +1,19 @@
+---
+testup_local:                       true
+# how to get from *the playbook that calls this role* to the project root
+testup_relative_path_to_root:       "" # "../"
+testup_deploy_dir:                  ""
+testup_gemfile_template:            "default_gemfile.j2"
+testup_gitignore_template:          "default_gitignore_block.j2"
+testup_manage_gemfile:              true
+testup_cucumber_vars_template:      "default_cucumber_vars.rb"
+testup_cucumber_step_template:      "default_step_definition.rb"
+testup_cucumber_feature_template:   "default.feature"
+testup_cucumber_playbook_template:  "default_tests_playbook.yml"
+testup_capybara:                    true
+testup_cucumber:                    true
+testup_cucumber_dir:                "features/"
+testup_cucumber_repo:               ""
+testup_cucumber_repo_version:       "HEAD"
+testup_serverspec:                  false
+testup_serverspec_repo:             ""

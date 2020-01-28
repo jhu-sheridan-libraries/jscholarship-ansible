@@ -1,0 +1,10 @@
+---
+# TODO: support specifying all vars per webapp
+- name: configure tomcat context
+  template:
+    src: "{{ dspace_context_template }}"
+    dest: "{{ catalina_home }}/conf/Catalina/localhost/{{ (item.default_webapp | default(false)) | ternary('ROOT', item.name) }}.xml"
+    owner: "{{ dspace_user }}"
+    group: "{{ dspace_group }}"
+  with_items: "{{ dspace_webapps }}"
+  notify: restart tomcat

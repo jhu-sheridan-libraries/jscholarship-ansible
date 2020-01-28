@@ -1,0 +1,42 @@
+---
+- name: stop tomcat
+  systemd:
+    name: tomcat
+    state: stopped
+  become: true
+
+- name: start tomcat
+  systemd:
+    name: tomcat
+    state: started
+  become: true
+
+- name: restart tomcat
+  systemd:
+    name: tomcat
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+  become: true
+
+- name: maven package updates
+  become: true
+  become_user: "{{ app_user }}"
+  shell: "source /etc/profile && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false"
+  args:
+    chdir: "{{ dspace_source }}/dspace"
+  listen: update configs
+
+- name: ant update configs
+  become: true
+  become_user: "{{ app_user }}"
+  shell: "source /etc/profile && ant update_configs"
+  args:
+    chdir: "{{ dspace_source }}/dspace/target/dspace-installer"
+  listen: update configs
+  notify: restart tomcat
+
+- name: configs updated
+  debug:
+    msg: "...configuration updated"
+  listen: update configs

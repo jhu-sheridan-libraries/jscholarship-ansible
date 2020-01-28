@@ -1,0 +1,18 @@
+###########################################################################
+# {{ shortname | upper }} is the name of the appender for the {{ shortname }} curation task
+###########################################################################
+# Set {{ shortname }} logger priority to {{ loglevel }} and its only appender to {{ shortname | upper }}.
+log4j.logger.{{ package }}={{ loglevel }}, {{ shortname | upper }}
+# Do not change these lines, say all the examples. idky
+log4j.additivity.{{ package }}=false
+# The name of the file appender
+log4j.appender.{{ shortname | upper }}=org.dspace.app.util.DailyFileAppender
+# The filename of the log file created. A date stamp is appended to this
+log4j.appender.{{ shortname | upper }}.File={{ dspace_log_dir }}/{{ shortname }}.log
+# Set this to yyyy-MM-DD for daily log files, or yyyy-MM for monthly files
+log4j.appender.{{ shortname | upper }}.DatePattern=yyyy-MM-dd
+# The number of log files to keep, or 0 to keep them all
+log4j.appender.{{ shortname | upper }}.MaxLogs=0
+# {{ shortname | upper }} uses PatternLayout.
+log4j.appender.{{ shortname | upper }}.layout=org.apache.log4j.PatternLayout
+log4j.appender.{{ shortname | upper }}.layout.ConversionPattern=%d %-5p %c @ %m%n

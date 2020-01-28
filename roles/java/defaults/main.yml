@@ -1,0 +1,9 @@
+---
+# use colloquial versions, e.g. 8
+# will get translated, e.g. java-1.8.0, as appropriate.
+# valid values: 8, 7, and (probably) 6
+java_version: 8
+
+# by default, install just the JRE.
+# override by setting jdk to true
+jdk: false

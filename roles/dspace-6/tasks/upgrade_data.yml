@@ -1,0 +1,23 @@
+---
+- name: run the command to check database for connectivity
+  shell: "{{ dspace_install }}/bin/dspace database test"
+  become: true
+  become_user: "{{ app_user }}"
+
+- name: run the command to check database for compatibility
+  shell: "{{ dspace_install }}/bin/dspace database info"
+  become: true
+  become_user: "{{ app_user }}"
+  register: database_info
+
+# NOTE: contrary to documentation, could not find a meaningful test
+# https://wiki.duraspace.org/display/DSDOC6x/Upgrading+DSpace#UpgradingDSpace-UpgradeSteps
+# - name: do not proceed if database is incompatible
+#   fail:
+#     msg: "Cannot automate this upgrade due to an incompatibility in the data"
+#   when: "'looks to be compatible' not in database_info.stdout"
+
+- name: upgrade database
+  shell: "{{ dspace_install }}/bin/dspace database migrate"
+  become: true
+  become_user: "{{ app_user }}"

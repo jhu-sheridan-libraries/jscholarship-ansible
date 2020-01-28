@@ -1,0 +1,20 @@
+---
+# TODO: confirm belief that tomcat must run to load dspace webapp at least once before creating administrator
+- name: start tomcat
+  command: "echo 'starting tomcat after installing dspace'"
+  changed_when: true
+  notify: start tomcat
+
+- meta: flush_handlers
+
+- name: create administrator
+  shell: >
+    {{ dspace_install }}/bin/dspace create-administrator
+    -e {{ item.email }}
+    -f {{ item.firstname }}
+    -l {{ item.lastname }}
+    -c {{ item.language }}
+    -p {{ item.password }}
+  become: true
+  become_user: "{{ dspace_user }}"
+  with_items: "{{ dspace_admins }}"

@@ -1,0 +1,88 @@
+---
+- name: check for existing Gemfile
+  stat:
+    path: "{{ testup_relative_path_to_root }}Gemfile"
+  register: gemfile
+
+- name: create Gemfile
+  command: "bundle init"
+  args:
+    chdir: "{{ testup_relative_path_to_root }}"
+  when: testup_manage_gemfile and not gemfile.stat.exists
+
+- name: template Gemfile
+  blockinfile:
+    block:  "{{ lookup('template', testup_gemfile_template) }}"
+    dest: "{{ testup_relative_path_to_root }}Gemfile"
+    marker: "# {mark} testup"
+
+- name: install gems for testing
+  bundler:
+    chdir: "{{ testup_deploy_dir if testup_deploy_dir != '' else omit }}"
+    gem_path: "vendor/bundle"
+
+# begin cucumber
+- block:
+    - name: set up cucumber
+      shell: "bundle exec cucumber --init"
+      args:
+        chdir: "{{ testup_relative_path_to_root }}"
+      when: testup_cucumber_repo == ""
+
+    - name: make sure cucumber dir exists
+      file:
+        path: "{{ testup_relative_path_to_root }}{{ testup_cucumber_dir }}"
+        state: directory
+      when: testup_cucumber_repo != ""
+
+    - name: get cucumber tests from repo
+      git:
+        repo: "{{ testup_cucumber_repo }}"
+        dest: "{{ testup_relative_path_to_root }}{{ testup_cucumber_dir }}"
+        version: "{{ testup_cucumber_repo_version }}"
+      when: testup_cucumber_repo != ""
+
+    - name: gitignore features directory (and possibly Gemfile)
+      blockinfile:
+        block:  "{{ lookup('template', testup_gitignore_template) }}"
+        dest: "{{ testup_relative_path_to_root }}.gitignore"
+        marker: "# {mark} testup"
+
+    - name: set variables for tests
+      template:
+        src: "{{ testup_cucumber_vars_template }}"
+        dest: "{{ testup_relative_path_to_root }}{{ testup_cucumber_dir }}support/test_vars.rb"
+        force: true
+
+    - block:
+      - name: create default step definition
+        template:
+          src: "{{ testup_cucumber_step_template }}"
+          dest: "{{ testup_relative_path_to_root }}{{ testup_cucumber_dir }}step_definitions/test_vars.rb"
+
+      - name: create default feature
+        template:
+          src: "{{ testup_cucumber_feature_template }}"
+          dest: "{{ testup_relative_path_to_root }}{{ testup_cucumber_dir }}test_vars.feature"
+      when: testup_cucumber_repo == ""
+
+    # begin default playbook block
+    - block:
+      - name: create playbooks and templates dirs
+        file:
+          path: "{{ testup_relative_path_to_root }}playbooks/templates"
+          state: directory
+
+      - name: create default test vars template
+        template:
+          src: "{{ testup_cucumber_vars_template }}"
+          dest: "{{ testup_relative_path_to_root }}playbooks/templates/test_vars.rb"
+
+      - name: create default tests playbook
+        template:
+          src: "{{ testup_cucumber_playbook_template }}"
+          dest: "{{ testup_relative_path_to_root }}playbooks/tests_run.yml"
+    # end default playbook block
+
+  when: testup_cucumber
+# end cucumber

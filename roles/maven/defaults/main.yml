@@ -1,0 +1,14 @@
+---
+# https://archive.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.tar.gz
+maven_minimum_java_version: 1.7
+maven_major_version:        3
+maven_minor_version:        5
+maven_patch_version:        2
+maven_version:              "{{ maven_major_version }}.{{ maven_minor_version }}.{{ maven_patch_version }}"
+maven_install_dir:          "/usr/local"
+maven_download_dir:         "{{ ansible_env.HOME}}"
+maven_dir:                  "apache-maven-{{ maven_version }}"
+maven_download_file:        "{{ maven_dir }}-bin.tar.gz"
+maven_url:                  "https://archive.apache.org/dist/maven/maven-{{ maven_major_version }}/{{ maven_version }}/binaries/{{ maven_download_file }}"
+maven_checksum_algo:        "sha1"
+maven_checksum_url:         "{{ maven_url }}.{{ maven_checksum_algo }}"

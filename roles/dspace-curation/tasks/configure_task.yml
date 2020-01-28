@@ -1,0 +1,21 @@
+---
+- name: configure task for commandline
+  blockinfile:
+    dest: "{{ dspace_install }}/config/modules/curate.cfg"
+    insertafter: '^plugin.named.org.dspace.curate.CurationTask.*$'
+    block: |
+      plugin.named.org.dspace.curate.CurationTask = {{ package }}.{{ classname }} = {{ shortname }}
+    marker: "# {mark} {{ item.shortname }} task class"
+    state: "{{ item.state }}"
+  notify: restart tomcat
+
+- name: configure task for ui
+  blockinfile:
+    dest: "{{ dspace_install }}/config/modules/curate.cfg"
+    insertafter: '^ui.tasknames.*$'
+    block: |
+      curate.ui.tasknames = {{ item.shortname }} = {{ item.ui_taskname }}
+    marker: "# {mark} {{ item.shortname }} taskname"
+    state: "{{ item.state }}"
+  when: ui_taskname != ''
+  notify: restart tomcat

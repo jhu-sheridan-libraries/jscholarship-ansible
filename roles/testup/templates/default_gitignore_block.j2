@@ -1,0 +1,9 @@
+{% if testup_cucumber_repo != "" %}
+{{ testup_cucumber_dir }}
+{% endif %}
+{% if testup_manage_gemfile %}
+Gemfile
+Gemfile.lock
+.bundle/
+vendor/
+{% endif %}

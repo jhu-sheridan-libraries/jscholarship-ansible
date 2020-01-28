@@ -1,0 +1,21 @@
+---
+  - name: install ImageMagick and Ghostscript - Debian
+    apt:
+      update_cache: yes
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - ghostscript
+      - imagemagick
+    when: ansible_os_family == 'Debian'
+    #  /etc/ImageMagick-6/policy.xml
+
+  - name: install ImageMagick and Ghostscript - RedHat
+    yum:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - ghostscript
+      - ImageMagick
+    when: ansible_os_family == 'RedHat'
+    # /etc/ImageMagick/policy.xml

@@ -1,0 +1,21 @@
+---
+# defaults file for shibboleth-sp
+shib_config_dir:      "/etc/shibboleth"
+shib_hostname:           "{{ hostname | default('myapp') }}"
+
+shib_debugging:             "{{ debugging | default(false) }}"
+shib_install:               true
+shib_backup_configs:        false
+shib_repo_template:         "sp_repo.j2"
+shib_package:               "shibboleth.x86_64"
+shib_virtualhost_template:  "virtualhost.j2"
+shib_attribute_template:    "attribute-map.xml.dist.j2"
+shib_config_template:       "shibboleth2.xml.dist.j2"
+shib_repo_name:             "shibboleth"
+shib_repo_description:      "Shibboleth (CentOS_7)"
+shib_repo_mirrorlist:       "https://shibboleth.net/cgi-bin/mirrorlist.cgi/CentOS_7"
+shib_repo_gpgkey:           "https://downloadcontent.opensuse.org/repositories/security:/shibboleth/CentOS_7/repodata/repomd.xml.key"
+
+shib_user:            "shibd"
+shib_group:           "shibd"
+apache_config_file:    "/etc/httpd/conf.d/01_{{ shib_hostname }}.conf"

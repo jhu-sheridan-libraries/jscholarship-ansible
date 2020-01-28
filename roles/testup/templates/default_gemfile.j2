@@ -1,0 +1,24 @@
+{% if false %}
+# frozen_string_literal: true
+source "https://rubygems.org"
+
+git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+
+{% endif %}
+{# TODO: set groups dynamically? #}
+group :development, :test do
+{# TODO: review #}
+{% if testup_capybara %}
+  gem 'capybara'
+{% endif %}
+{% if testup_cucumber %}
+  gem 'cucumber'
+{% endif %}
+{% if testup_serverspec %}
+  gem 'serverspec'
+{% endif %}
+  gem 'rake'
+  gem 'chromedriver-helper'
+  gem 'selenium-webdriver'
+  gem 'rspec'
+end

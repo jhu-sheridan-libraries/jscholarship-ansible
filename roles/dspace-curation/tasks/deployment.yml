@@ -1,0 +1,11 @@
+---
+- name: deploy tasks
+  include: deploy_task.yml
+  become: true
+  become_user: "{{ dspace_user }}"
+  vars:
+    path:         "{{ dspace_curation_path }}"
+    bundle:       "{{ item.bundle }}"
+    state:        "{{ item.state }}"
+    ui_taskname:  "{{ item.ui_taskname | default('') }}"
+  with_items:     "{{ dspace_curation_tasks }}"

@@ -1,0 +1,7 @@
+---
+# defaults file for secure-ssh
+# TODO: check other OSes and provide overrides, where needed
+ssh_config: "/etc/ssh/sshd_config"
+ssh_settings:
+  - regexp: "^PermitRootLogin"
+    setting: "PermitRootLogin no"

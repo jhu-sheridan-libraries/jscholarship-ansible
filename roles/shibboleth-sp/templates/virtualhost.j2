@@ -1,0 +1,6 @@
+  # Protect the shibboleth endpoint in the app
+  <Location /secure >
+    AuthType shibboleth
+    ShibRequestSetting requireSession 1
+    Require valid-user
+  </Location>

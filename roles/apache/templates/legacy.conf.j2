@@ -1,0 +1,74 @@
+<VirtualHost *:80>
+  ServerName {{ apache_hostname }}
+  ServerAlias {{ apache_fqdn }}
+
+{% if apache_https %}
+# BEGIN {{ apache_http_redirect_marker }}
+  Redirect "/" "https://{{ apache_fqdn }}/"
+# END {{ apache_http_redirect_marker }}
+{% elif apache_proxy_tomcat %}
+# BEGIN {{ apache_proxy_tomcat_marker }}
+  ProxyPass           / ajp://localhost:8009/
+  ProxyPassReverse    / ajp://localhost:8009/
+# END {{ apache_proxy_tomcat_marker }}
+{% endif %}
+
+# BEGIN {{ apache_http_logging_marker }}
+  LogLevel {{ apache_log_level }}
+  ErrorLog "{{ apache_log_path }}/{{ apache_hostname }}-error.log"
+  CustomLog "{{ apache_log_path }}/{{ apache_hostname }}-access.log" combined
+# END {{ apache_http_logging_marker }}
+</VirtualHost>
+
+{% if apache_https %}
+<VirtualHost *:443>
+  ServerName {{ apache_hostname }}
+  ServerAlias {{ apache_fqdn }}
+
+{% if apache_proxy_tomcat %}
+# BEGIN {{ apache_proxy_tomcat_marker }}
+  ProxyPass           / ajp://localhost:8009/
+  ProxyPassReverse    / ajp://localhost:8009/
+# END {{ apache_proxy_tomcat_marker }}
+{% endif %}
+
+# BEGIN {{ apache_header_mod_marker }}
+  RequestHeader unset X-Forwarded-Host
+# END {{ apache_header_mod_marker }}
+
+# BEGIN {{ apache_https_logging_marker }}
+  LogLevel {{ apache_log_level }}
+  ErrorLog "{{ apache_log_path }}/{{ apache_hostname }}-ssl-error.log"
+  CustomLog "{{ apache_log_path }}/{{ apache_hostname }}-ssl-access.log" combined
+# END {{ apache_https_logging_marker }}
+
+  SSLEngine on
+
+  SSLCertificateFile {{ ssl_certificate_path }}/{{ ssl_certificate_file }}
+  SSLCertificateKeyFile {{ ssl_certificate_key_path }}/{{ ssl_certificate_key_file }}
+{% if ssl_certificate_chain_file | default(false) %}
+  SSLCertificateChainFile {{ ssl_certificate_path }}/{{ ssl_certificate_chain_file }}
+{% endif %}
+
+  # HSTS (mod_headers is required) (15768000 seconds = 6 months)
+  Header always set Strict-Transport-Security "max-age=15768000"
+
+</VirtualHost>
+
+# BEGIN {{ apache_ssl_config_marker }}
+
+# SSL configuration from:
+# https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=apache-2.2.15&openssl=1.0.1e&hsts=yes&profile=intermediate
+SSLProtocol             all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+SSLCipherSuite          ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
+SSLHonorCipherOrder     on
+
+# END {{ apache_ssl_config_marker }}
+
+{% endif %}
+
+# BEGIN {{ apache_trace_marker }}
+{% if not apache_trace_enabled %}
+  TraceEnable off
+{% endif %}
+# END {{ apache_trace_marker }}

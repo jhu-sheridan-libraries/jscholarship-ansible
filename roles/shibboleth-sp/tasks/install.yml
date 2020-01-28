@@ -1,0 +1,18 @@
+---
+# NOTE: at present, Centos 7 yum install is incompatible with everything else:
+# https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPLinuxRPMInstall
+- name: add shibboeth repo
+  yum_repository:
+    name: "{{ shib_repo_name }}"
+    description: "{{ shib_repo_description }}"
+    mirrorlist: "{{ shib_repo_mirrorlist }}"
+    gpgkey:   "{{ shib_repo_gpgkey }}"
+    gpgcheck: yes
+    enabled: yes
+  when: ansible_os_family == 'RedHat'
+
+- name: install shibboleth-sp
+  yum:
+    name: "{{ shib_package }}"
+    enablerepo: shibboleth
+    state: present

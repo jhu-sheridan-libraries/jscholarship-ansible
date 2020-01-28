@@ -1,0 +1,70 @@
+---
+- name: get java version
+  shell:   "java -version 2>&1"
+  register: java_version_result
+  changed_when: false
+
+  # NOTE: regex_search() returns an array of matches, so we will need to use the 'first' filter to make use of the first (and only) value
+- set_fact: returned_java_version={{ java_version_result.stdout | regex_replace('^$','0.0.0') | regex_search('(?P<test>\d+\.\d+.\d+)', '\\g<test>' ) | first }}
+
+- name: test java version
+  fail:
+    msg: "this installation of ant requires java version {{ ant_minimum_java_version }} or higher"
+  when: "not returned_java_version | version_compare(ant_minimum_java_version, '>=')"
+
+- name: get ant checksum
+  set_fact:
+    ant_checksum: "{{ ant_checksum_algo }}:{{ item }}"
+  with_url: "{{ ant_checksum_url }}"
+
+- name: get ant
+  get_url:
+    url:      "{{ ant_url }}"
+    dest:     "{{ ant_download_dir }}"
+    checksum: "{{ ant_checksum }}"
+  register: got_ant
+
+- name: extract ant
+  unarchive:
+    src:        "{{ ant_download_dir }}/{{ ant_download_file }}"
+    dest:       "{{ ant_install_dir }}"
+    remote_src: yes
+  # when: got_ant.changed
+  become: true
+
+- name: symlink ant
+  file:
+    src:    "{{ ant_install_dir }}/{{ ant_dir }}"
+    dest:   "{{ ant_install_dir }}/ant"
+    state:  link
+  become: true
+
+- name: set ant home environment var
+  lineinfile:
+    dest:   "/etc/profile.d/ant.sh"
+    line:   "export ANT_HOME={{ ant_install_dir }}/ant"
+    state:  present
+    create: yes
+  become: true
+
+- name: put ant on the path
+  lineinfile:
+    dest:   "/etc/profile.d/ant.sh"
+    line:   "export PATH=$ANT_HOME/bin:$PATH"
+    state:  present
+    create: yes
+  become: true
+
+- name: get ant version
+  shell: "bash -lc 'ant -version'"
+  register: ant_version_result
+  changed_when: false
+  become: false
+
+  # NOTE: regex_search() returns an array of matches, so we will need to use the 'first' filter to make use of the first (and only) value
+- set_fact: returned_ant_version={{ ant_version_result.stdout | regex_replace('^$','0.0.0') | regex_search('(?P<test>\d+\.\d+.\d+)', '\\g<test>' ) | first }}
+
+- name: test ant version
+  fail:
+    msg: "attempted to install ant {{ ant_version }}, but something went wrong"
+  when: "not returned_ant_version | version_compare(ant_version, '==')"

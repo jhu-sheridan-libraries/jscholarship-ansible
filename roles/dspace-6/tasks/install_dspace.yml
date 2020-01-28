@@ -1,0 +1,22 @@
+---
+- name: set defaults
+  set_fact:
+    ant_command: "fresh_install"
+- name: set vars for upgrading
+  set_fact:
+    ant_command: "update"
+  when: upgrading is defined and upgrading
+
+- name: stop tomcat
+  command: "echo 'stopping tomcat to install dspace'"
+  changed_when: true
+  notify: stop tomcat
+
+- meta: flush_handlers
+
+- name: install dspace
+  become: true
+  become_user: "{{ dspace_user }}"
+  shell: "source /etc/profile && ant {{ ant_command }}"
+  args:
+    chdir: "{{ dspace_source }}/dspace/target/dspace-installer"

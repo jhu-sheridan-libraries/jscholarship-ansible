@@ -1,0 +1,45 @@
+---
+- name: get psi-probe release
+  get_url:
+    url: "{{ psiprobe_release }}"
+    dest: "{{ catalina_home }}/webapps"
+    checksum: "{{ psiprobe_checksum_algorithm }}:{{ psiprobe_checksum }}"
+  register: release_result
+  notify: restart tomcat
+
+- name: set vars that follow from the value of tomcat_manager_access
+  set_fact:
+    access_state: "present"
+  when: tomcat_manager_access
+- set_fact:
+    access_state: "absent"
+  when: not tomcat_manager_access
+
+- name: configure tomcat-users - roles
+  lineinfile:
+    dest: "{{ catalina_home }}/conf/tomcat-users.xml"
+    regexp: '^<role rolename="{{ item }}" />'
+    line: '<role rolename="{{ item }}" />'
+    insertbefore: '</tomcat-users>'
+    state: "{{ access_state }}"
+  with_items: "{{ tomcat_roles }}"
+
+- name: configure tomcat-users - users
+  lineinfile:
+    dest: "{{ catalina_home }}/conf/tomcat-users.xml"
+    regexp: '^<user username="{{ item.username }}"'
+    line: '<user username="{{ item.username }}" password="{{ item.password }}" roles="{{ item.roles }}" />'
+    insertbefore: '</tomcat-users>'
+    state: "{{ access_state }}"
+  with_items: "{{ tomcat_users }}"
+
+- name: create tomcat service directory for additional configuration
+  file:
+    path: "/etc/systemd/system/tomcat.service.d"
+    state: directory
+
+- name: set psi-probe system properties
+  template:
+    src: "psi-probe.conf.j2"
+    dest: "/etc/systemd/system/tomcat.service.d/psi-probe.conf"
+  notify: restart tomcat

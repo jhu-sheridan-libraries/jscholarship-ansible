@@ -1,0 +1,4 @@
+---
+- debug: msg="trigger tomcat start"
+  notify: start tomcat
+  changed_when: true

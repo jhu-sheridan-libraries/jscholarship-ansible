@@ -1,0 +1,26 @@
+---
+- name: configure tasks (v < 6)
+  become: true
+  become_user: "{{ dspace_user }}"
+  template:
+    src: "{{ dspace_curation_cfg_template }}"
+    dest: "{{ dspace_install }}/config/modules/curate.cfg"
+    backup: true
+  when: dspace_major_version < 6
+  notify: restart tomcat
+
+# TODO: test
+- name: configure tasks (v >= 6)
+  include: configure_task.yml
+  become: true
+  become_user: "{{ dspace_user }}"
+  vars:
+    path:         "{{ dspace_curation_path }}"
+    shortname:    "{{ item.shortname }}"
+    ui_taskname:  "{{ item.ui_taskname | default('') }}"
+    package:      "{{ item.package }}"
+    classname:    "{{ item.classname }}"
+    bundle:       "{{ item.bundle }}"
+    state:        "{{ item.state }}"
+  with_items:     "{{ dspace_curation_tasks }}"
+  when: dspace_major_version >= 6

@@ -1,0 +1,87 @@
+---
+- name: setup dspace install directory
+  file:
+    path: "{{ dspace_install }}"
+    owner: "{{ dspace_user }}"
+    group: "{{ dspace_group }}"
+    state: directory
+  become: true
+
+- block:
+  # NOTE: keeping the release archive around to improve idempotency
+  # TODO: add checksum
+  - name: get dspace release
+    get_url:
+      url: "{{ release }}"
+      dest: "{{ dspace_source }}.tar.gz"
+    register: release_downloaded
+
+  - name: unpack release
+    unarchive:
+      src: "{{ dspace_source }}.tar.gz"
+      dest: "{{ dspace_user_home }}"
+      owner: "{{ dspace_user }}"
+      group: "{{ dspace_user }}"
+      copy: no
+    when: release_downloaded.changed
+
+  - name: remove previous install
+    file:
+      path: "{{ dspace_source }}"
+      state: absent
+    when: release_downloaded.changed
+
+  - name: rename release
+    command: "mv {{ dspace_user_home }}/{{ release_dir }} {{ dspace_source }}"
+    when: release_downloaded.changed
+
+  # NOTE: necessary to chown some files deep in the tree that
+  #  were resistant to the implicit chown in the unarchive step
+  - name: set ownership of source directory
+    file:
+      path: "{{ dspace_source }}"
+      owner: "{{ dspace_user }}"
+      group: "{{ dspace_group }}"
+      recurse: yes
+      state: directory
+  when: not build_from_repo
+
+- block:
+  - name: clone dspace from repo
+    git:
+      repo: "{{ repo }}"
+      dest: "{{ dspace_source }}"
+      version: "{{ branch | default('HEAD') }}"
+    become: true
+    become_user: "{{ dspace_user }}"
+  when: build_from_repo
+
+- name: build properties
+  template:
+    src: "{{ dspace_build_properties_template }}"
+    dest: "{{ dspace_source }}/build.properties"
+    owner: "{{ dspace_user }}"
+    group: "{{ dspace_group }}"
+    backup: true
+
+- block:
+  - name: disable current theme
+    replace:
+      dest: "{{ dspace_source }}/dspace/config/xmlui.xconf"
+      regexp: '(^\s*)(<theme name="Atmire.*/>)'
+      replace: '\1<!-- \2 -->'
+
+  - name: "enable the {{ dspace_theme_name }} theme"
+    lineinfile:
+      dest: "{{ dspace_source }}/dspace/config/xmlui.xconf"
+      insertbefore: '(^\s*)(</themes>)'
+      regexp: "(^\\s*)(<theme name=\"{{ dspace_theme_name }}\")"
+      line:   "        <theme name=\"{{ dspace_theme_name }}\" regex=\".*\" path=\"{{ dspace_theme_path }}/\" />"
+  when: dspace_use_alt_theme
+
+- name: maven package
+  become: true
+  become_user: "{{ dspace_user }}"
+  shell: "source /etc/profile && mvn clean package -Dmirage2.on=true -Dmirage2.deps.included=false"
+  args:
+    chdir: "{{ dspace_source }}"

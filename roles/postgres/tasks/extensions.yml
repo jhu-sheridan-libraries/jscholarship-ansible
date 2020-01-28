@@ -1,0 +1,27 @@
+---
+# vars:
+#   databases:      "{{ postgres_databases }}"
+#   extra_packages: "{{ postgres_extra_packages }}"
+#   extensions:     "{{ postgres_extensions }}"
+
+- name: replace generic contrib package with a versioned package
+  set_fact:
+    versioned_packages: "{{ extra_packages | map('replace', 'postgresql-contrib', postgres_contrib) | list }}"
+
+- name: install extra packages
+  become: true
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - "{{ versioned_packages }}"
+
+- name: install and enable extensions for databases
+  become: true
+  become_user:        "{{ postgres_admin_user }}"
+  postgresql_ext:
+    db:               "{{ item.0 }}"
+    name:             "{{ item.1 }}"
+  with_nested:
+  - "{{ databases | map(attribute='name') | list }}"
+  - "{{ extensions }}"

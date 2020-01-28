@@ -1,0 +1,21 @@
+- name: set path to curation module
+  set_fact:
+    dspace_curation_path: "{{ dspace_curation_source }}"
+- set_fact:
+    dspace_curation_path: "{{ dspace_curation_source }}/{{ dspace_curation_module }}"
+  when: dspace_curation_module != ''
+
+- name: clone curation tasks from repo
+  git:
+    repo: "{{ dspace_curation_repo }}"
+    dest: "{{ dspace_curation_source }}"
+    version: "{{ dspace_curation_branch | default('HEAD') }}"
+  become: true
+  become_user: "{{ dspace_user }}"
+
+- name: maven package
+  become: true
+  become_user: "{{ dspace_user }}"
+  shell: "source /etc/profile && mvn clean package"
+  args:
+    chdir: "{{ dspace_curation_path }}"

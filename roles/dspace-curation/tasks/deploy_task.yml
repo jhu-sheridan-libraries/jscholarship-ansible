@@ -1,0 +1,32 @@
+---
+- name: deploy task for commandline
+  copy:
+    src: "{{ path }}/target/{{ bundle }}"
+    dest: "{{ dspace_lib }}"
+    remote_src: true
+  when: state == 'present'
+  notify: restart tomcat
+
+- name: remove task from commandline
+  file:
+    dest: "{{ dspace_lib }}/{{ bundle }}"
+    state: "{{ state }}"
+  when: state == 'absent'
+  notify: restart tomcat
+
+- block:
+  - name: deploy task for ui
+    copy:
+      src: "{{ path }}/target/{{ bundle }}"
+      dest: "{{ dspace_xmlui_lib }}"
+      remote_src: true
+    when: state == 'present'
+    notify: restart tomcat
+
+  - name: remove task from ui
+    file:
+      dest: "{{ dspace_xmlui_lib }}/{{ bundle }}"
+      state: "{{ state }}"
+    when: state == 'absent'
+    notify: restart tomcat
+  when: ui_taskname != ''
