@@ -1,1 +1,1 @@
-NOTE: .gitignoring the contents of this folder, *except* roles named local.[whatever].
+NOTE: roles formerly in dheles/* are included here now
