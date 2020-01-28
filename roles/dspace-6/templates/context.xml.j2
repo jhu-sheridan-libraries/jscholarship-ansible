@@ -6,8 +6,4 @@
 {% endif %}
   reloadable="{{ dspace_context_reloadable }}" >
   <Resources cachingAllowed="{{ dspace_context_caching_allowed }}" />
-{% if item.address_restriction | default(false) %}
-  <Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="{{ dspace_ip_whitelist | join('|') }}"/>
-  <Parameter name="LocalHostRestrictionFilter.localhost" value="false" override="false" />
-{% endif %}
 </Context>
